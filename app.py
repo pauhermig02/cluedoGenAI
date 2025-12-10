@@ -8,9 +8,17 @@ from html import escape, unescape
 from typing import Dict, List, Optional
 from datetime import datetime
 import re
-
-
+import signal
+from dotenv import load_dotenv
 import streamlit as st
+
+if sys.platform == "win32":
+    if not hasattr(signal, "SIGHUP"):
+        signal.SIGHUP = signal.SIGTERM
+        signal.SIGTSTP = signal.SIGTERM
+        signal.SIGCONT = signal.SIGTERM
+
+load_dotenv()
 
 
 # ✅ Añadir la carpeta src al PYTHONPATH para que se vea cluedogenai
@@ -550,17 +558,17 @@ LATEST QUESTION FROM THE DETECTIVE (ANSWER THIS ONE):
 """.strip()
 
 
-
 def render_conversation(suspect_name: str) -> None:
-    """Muestra la conversación usando st.chat_message, sin HTML manual."""
+    """Muestra la conversación en una caja de altura fija con scroll."""
     history = st.session_state.histories.get(suspect_name, [])
 
-    # Contenedor para que no ocupe toda la página
-    chat_box = st.container()
+    # 🔹 CAMBIO CLAVE: Definimos una altura fija (ej. 500px).
+    # Esto activa el scroll automático y evita que la página crezca.
+    chat_box = st.container(height=250, border=True)
 
     with chat_box:
         if not history:
-            st.info("No questions yet. Ask something sharp.")
+            st.info(f"No questions for {suspect_name} yet. Ask something sharp.")
             return
 
         # Recorremos el historial y pintamos cada turno
