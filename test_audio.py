@@ -1,181 +1,153 @@
-# test_audio.py
-import streamlit as st
-from time import sleep
+#!/usr/bin/env python3
+"""
+test_music_manager.py
+
+Script de prueba para comprobar que music_manager scan_tracks / selección funcionan.
+
+Uso:
+  python test_music_manager.py              # solo muestra resumen y rutas
+  python test_music_manager.py --make-html  # además crea music_test_player.html con bg + sfx incrustados
+
+Requisitos:
+  - Tener music_manager.py en el mismo proyecto y la carpeta assets/audio/ con mp3.
+"""
+
 import os
+import sys
+import argparse
 import base64
 import random
+from typing import Optional
 
-# Importa las funciones de music_manager (que ya tienes tal cual)
-from music_manager import (
-    init_music,
-    set_music_mode,
-    trigger_accusation_sound,
-    trigger_question_sound,
-)
+# Intentamos importar el módulo music_manager del proyecto
+try:
+    import music_manager
+except Exception as e:
+    print("ERROR: no se pudo importar music_manager. Asegúrate de que music_manager.py está en el proyecto.")
+    print("Detalles:", e)
+    sys.exit(1)
 
-st.set_page_config(page_title="TEST AUDIO", layout="centered")
-st.title("Test de audio CluedoGenAI (UI)")
 
-# ---------- Inicialización (solo UI) ----------
-# init_music() rellenará st.session_state.music_tracks y demás flags
-init_music()
+def human_size(n: int) -> str:
+    for unit in ("B", "KB", "MB", "GB"):
+        if n < 1024.0:
+            return f"{n:3.1f}{unit}"
+        n /= 1024.0
+    return f"{n:.1f}TB"
 
-# Aseguramos clave para audio_enabled (para sortear bloqueo de autoplay)
-if "audio_enabled" not in st.session_state:
-    st.session_state.audio_enabled = False
 
-# Botón explícito para permitir sonido
-col_enable, _ = st.columns([1, 4])
-with col_enable:
-    if not st.session_state.audio_enabled:
-        if st.button("Activar audio (click para permitir sonido)"):
-            st.session_state.audio_enabled = True
-            st.success("Audio activado. Si hay pistas, la música de fondo debería comenzar pronto.")
+def file_size(path: str) -> Optional[int]:
+    try:
+        return os.path.getsize(path)
+    except Exception:
+        return None
 
-# Selector de modo
-modo = st.radio("Modo musical:", ["Ambient", "Ending"], index=0)
-if st.session_state.get("music_mode") != modo.lower():
-    set_music_mode(modo.lower())
 
-# Botones de prueba (marcan flags usando las funciones del manager)
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("Sonido de ACUSACIÓN", use_container_width=True):
-        trigger_accusation_sound()
-        st.success("Reproduciendo acusación...")
-
-with col2:
-    if st.button("Sonido de PREGUNTA", use_container_width=True):
-        trigger_question_sound()
-        st.info("Reproduciendo pregunta...")
-
-st.write("Si no suena: revisa `assets/audio` y pulsa 'Activar audio'.")
-st.write("DEBUG tracks (borra esta línea en producción):", st.session_state.get("music_tracks"))
-
-# ---------- Utilidades locales para la UI ----------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-def file_to_data_url(path: str) -> str | None:
-    """
-    Lee un archivo binario y devuelve una data URL 'data:audio/mp3;base64,...'
-    Devuelve None si el archivo no existe o no se puede leer.
-    """
+def file_to_data_url(path: str) -> Optional[str]:
+    """Convierte un fichero MP3 a data URL 'data:audio/mp3;base64,...'."""
     if not path or not os.path.isfile(path):
         return None
     with open(path, "rb") as f:
         b = f.read()
-    b64 = base64.b64encode(b).decode()
-    return f"data:audio/mp3;base64,{b64}"
+    return "data:audio/mp3;base64," + base64.b64encode(b).decode()
 
-def choose_random_path(paths: list[str]) -> str | None:
-    if not paths:
-        return None
-    return random.choice(paths)
 
-def _render_single_audio_tag_from_path(path: str) -> str:
-    """
-    Construye un tag <audio autoplay> para un sfx a partir de la ruta del fichero.
-    """
-    url = file_to_data_url(path)
-    if not url:
-        return ""
-    html = f"""
-    <audio autoplay style="display:none;">
-      <source src="{url}" type="audio/mpeg">
-    </audio>
-    """
-    return html
+def main(make_html: bool):
+    print("=== test_music_manager ===")
+    # 1) Escanear usando music_manager.scan_tracks()
+    # Le damos None para que use el default (assets/audio)
+    tracks = music_manager.scan_tracks()
+    print("Tracks escaneados (por categoría):")
+    for cat in ("ambient", "ending", "accuse", "question"):
+        lst = tracks.get(cat, []) or []
+        print(f"  - {cat}: {len(lst)} archivos")
+        # mostrar hasta 3 ejemplos
+        for i, p in enumerate(lst[:3], start=1):
+            size = file_size(p)
+            print(f"      {i}. {p}  ({human_size(size) if size else '??'})")
 
-def _build_bg_player_html(mode: str, tracks: dict, audio_enabled: bool) -> str:
-    """
-    Construye el HTML/JS del reproductor de fondo usando data URLs.
-    Si audio_enabled==False, arrancamos en muted para permitir autoplay en navegadores que lo permiten.
-    """
-    use_mode = (mode or "ambient").lower()
-    if use_mode == "ending":
-        bg_paths = tracks.get("ending", [])
+    # 2) Elegir bg y sfx (si existen)
+    bg = music_manager.choose_random_bg_url(tracks, mode="ambient")
+    sfx_q = music_manager.choose_random_sfx_url(tracks, kind="question")
+    sfx_a = music_manager.choose_random_sfx_url(tracks, kind="accuse")
+
+    print("\nSelección aleatoria (muestra):")
+    if bg:
+        print(f"  - background (ambient): {bg}  size={human_size(file_size(bg) or 0)}")
     else:
-        bg_paths = tracks.get("ambient", [])
+        print("  - background (ambient): (no disponible)")
 
-    sources = []
-    for p in bg_paths:
-        url = file_to_data_url(p)
-        if url:
-            sources.append(f"\"{url}\"")
+    if sfx_q:
+        print(f"  - sfx (question): {sfx_q}  size={human_size(file_size(sfx_q) or 0)}")
+    else:
+        print("  - sfx (question): (no disponible)")
 
-    if not sources:
-        return ""
+    if sfx_a:
+        print(f"  - sfx (accuse): {sfx_a}  size={human_size(file_size(sfx_a) or 0)}")
+    else:
+        print("  - sfx (accuse): (no disponible)")
 
-    sources_js_array = ",\n        ".join(sources)
-    js_audio_enabled = "true" if audio_enabled else "false"
-
-    html = f"""
-    <audio id="bg-music" style="display:none;"></audio>
-    <script>
-      const bgSources = [
-        {sources_js_array}
-      ];
-      const AUDIO_ENABLED = {js_audio_enabled};
-
-      function playRandomBg() {{
-        if (!bgSources.length) return;
-        const idx = Math.floor(Math.random() * bgSources.length);
-        const audio = document.getElementById("bg-music");
-        if (!audio) return;
-        audio.src = bgSources[idx];
-        audio.play().catch(() => {{ }});
-      }}
-
-      const audioEl = document.getElementById("bg-music");
-      if (audioEl) {{
-        audioEl.onended = playRandomBg;
-        audioEl.muted = !AUDIO_ENABLED;
-        if (AUDIO_ENABLED) {{
-          playRandomBg();
-        }} else {{
-          // intentar autoplay en modo muted (es más probable que el navegador lo permita)
-          audioEl.muted = true;
-          playRandomBg();
-        }}
-      }}
-    </script>
-    """
-    return html
-
-# ---------- Render del reproductor (llamar último) ----------
-def render_music_player():
-    tracks = st.session_state.get("music_tracks", {})
-    if not tracks:
+    # 3) Si no hay pistas, salimos
+    total = sum(len(tracks.get(c, []) or []) for c in ("ambient", "ending", "accuse", "question"))
+    if total == 0:
+        print("\nNo se han encontrado mp3 en assets/audio/. Coloca archivos con prefijos ambient_, ending_, accuse_, question_.")
         return
 
-    mode = st.session_state.get("music_mode", "ambient").lower()
-    audio_enabled = bool(st.session_state.get("audio_enabled", False))
+    # 4) Opción: crear HTML incrustando bg + sfx como data URLs
+    if make_html:
+        if not bg:
+            print("\nNo hay pista de background para generar el HTML. Abortando generación del HTML.")
+            return
+        # Elegimos un sfx preferible: question si existe, si no accuse, si no ninguno -> None
+        sfx = sfx_q or sfx_a
 
-    # 1) Música de fondo
-    bg_html = _build_bg_player_html(mode, tracks, audio_enabled)
-    if bg_html:
-        st.markdown(bg_html, unsafe_allow_html=True)
+        # Convertimos a data-URL (advertencia: puede ocupar varios MB)
+        print("\nConvirtiendo archivos a data-URL (esto puede tardar y usar memoria)...")
+        bg_data = file_to_data_url(bg)
+        sfx_data = file_to_data_url(sfx) if sfx else None
 
-    # 2) SFX acusación (si procede)
-    if st.session_state.get("music_accuse_pending", False):
-        p = choose_random_path(tracks.get("accuse", []))
-        if p:
-            sfx_html = _render_single_audio_tag_from_path(p)
-            if sfx_html:
-                st.markdown(sfx_html, unsafe_allow_html=True)
-        st.session_state.music_accuse_pending = False
+        if bg_data is None:
+            print("Error al leer/conertir el bg a data URL.")
+            return
 
-    # 3) SFX pregunta (si procede)
-    if st.session_state.get("music_question_pending", False):
-        p = choose_random_path(tracks.get("question", []))
-        if p:
-            sfx_html = _render_single_audio_tag_from_path(p)
-            if sfx_html:
-                st.markdown(sfx_html, unsafe_allow_html=True)
-        st.session_state.music_question_pending = False
+        html_lines = [
+            "<!doctype html>",
+            "<html>",
+            "<head><meta charset='utf-8'><title>Music Manager Test</title></head>",
+            "<body>",
+            "<h2>Music Manager Test Player</h2>",
+            "<p>Background (loop, autoplay). Si el navegador bloquea autoplay, pulsa play manualmente.</p>",
+            f"<audio id='bg' src='{bg_data}' loop controls autoplay style='width:100%;'></audio>",
+        ]
 
-# IMPORTANT: llamar siempre al final para que detecte los cambios de flags realizados por botones
-render_music_player()
+        if sfx_data:
+            html_lines += [
+                "<hr>",
+                "<p>SFX (reproducir manualmente o usando el botón):</p>",
+                f"<audio id='sfx' src='{sfx_data}' controls style='width:100%;'></audio>",
+                "<p><button onclick=\"document.getElementById('sfx').play();\">Play SFX</button></p>",
+            ]
 
-# pequeña pausa para mejorar estabilidad del render en algunos entornos
-sleep(0.2)
+        html_lines += [
+            "<hr>",
+            "<p>Nota: este HTML embebe los mp3 como data URLs. El archivo final puede ser grande.</p>",
+            "</body></html>",
+        ]
+
+        out_path = os.path.join(os.getcwd(), "music_test_player.html")
+        with open(out_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(html_lines))
+
+        # Mostrar info
+        html_size = os.path.getsize(out_path)
+        print(f"\nHTML generado en: {out_path}  (tamaño: {human_size(html_size)})")
+        print("Ábrelo en el navegador para probar la reproducción (puede que el navegador bloquee autoplay hasta que interactúes).")
+    else:
+        print("\nModo interactivo desactivado. Si quieres generar un HTML de prueba ejecuta con --make-html.")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Test music_manager (scan, choose bg/sfx, optional HTML player).")
+    parser.add_argument("--make-html", action="store_true", help="Generar music_test_player.html incrustando bg + sfx como data URLs (puede ser grande).")
+    args = parser.parse_args()
+    main(make_html=args.make_html)
