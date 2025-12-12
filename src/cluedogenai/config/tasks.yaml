@@ -49,6 +49,7 @@ define_characters:
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
+          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "physical_description": {
             "build": "skinny|fit|fat",
             "face": "short phrase describing facial traits",
@@ -76,6 +77,7 @@ define_characters:
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
+          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "physical_description": {
             "build": "skinny|fit|fat",
             "face": "short phrase describing facial traits",
@@ -103,14 +105,7 @@ define_characters:
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
-          "physical_description": {
-            "build": "skinny|fit|fat",
-            "face": "short phrase describing facial traits",
-            "hair": "short phrase describing hairstyle/color",
-            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
-            "distinctive_features": "short phrase (tattoos, posture, accessories)"
-            },
-          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
+          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": false
         },
@@ -130,14 +125,7 @@ define_characters:
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
-          "physical_description": {
-            "build": "skinny|fit|fat",
-            "face": "short phrase describing facial traits",
-            "hair": "short phrase describing hairstyle/color",
-            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
-            "distinctive_features": "short phrase (tattoos, posture, accessories)"
-            },
-          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
+          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": true
         }
@@ -206,24 +194,27 @@ generate_suspect_dialogue:
 
 design_scene_visuals:
   description: >
-    Based on the current scene_blueprint, the involved characters and the
-    latest suspect dialogue, design image generation prompts that visually
-    capture the mood and key elements of the scene. Focus on:
-    1. Location, lighting and atmosphere
-    2. Important props and visible clues
-    3. Framing and composition (what the "camera" sees)
-    4. A consistent noir / tech-office aesthetic
+    You will receive the output from 'define_characters', which is a JSON object
+    containing a list of exactly 4 suspects in the "suspects" array.
+    
+    Your goal is to generate a visual portrait for EACH suspect using the 
+    'Generate Character Image' tool.
+    
+    Step-by-step instructions:
+    1. Parse the incoming JSON to find the "suspects" list.
+    2. Iterate through every suspect in that list.
+    3. For each suspect, extract their individual data object (including name, 
+       physical_description, and clue_object) as a JSON string.
+    4. Call the 'Generate Character Image' tool passing that individual JSON string.
+    
+    CRITICAL: You must execute the tool exactly 4 times (once per suspect).
   expected_output: >
-    A JSON object with:
-    - "primary_prompt": one detailed text prompt for image generation
-    - "alternate_prompts": 1–2 shorter alternative prompts
-    - "style_tags": list of style descriptors (e.g. "noir", "cinematic")
-    - "safety_notes": optional notes on what to avoid (e.g. explicit gore)
+    A final summary report confirming that 4 images have been successfully 
+    generated. The report must list the names of the suspects and the 
+    file paths returned by the tool (e.g., "src/cluedogenai/generated_images/...").
   agent: vision_agent
   context:
-    - create_scene_blueprint
     - define_characters
-    - generate_suspect_dialogue
 
 curate_scene_audio:
   description: >

@@ -1,6 +1,7 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from .tools.image_tools import CharacterImageGeneratorTool
 from typing import List
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -43,8 +44,11 @@ class Cluedogenai():
     @agent
     def vision_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['vision_agent'], # type: ignore[index]
+            config=self.agents_config['vision_agent'],
+            # AQUI ES DONDE LE DAMOS LA HERRAMIENTA AL AGENTE:
+            tools=[CharacterImageGeneratorTool()], 
             verbose=True
+            allow_delegation=False #probar a cambiar a true por si le viene mejor nutrirse del resto de agentes pero más riesgo de alucinaciones
         )
     
     @agent
@@ -113,14 +117,17 @@ class Cluedogenai():
             agents=[
                 self.narrative_agent(),
                 self.character_agent(),
+                self.vision_agent(),
             ],
             tasks=[
                 self.create_scene_blueprint(),
                 self.define_characters(),
+                self.design_scene_visuals(),
             ],
             process=Process.sequential,
             verbose=True,
         )
+    
 
     @crew
     def dialogue_crew(self) -> Crew:
