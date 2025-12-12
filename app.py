@@ -80,6 +80,36 @@ def _extract_json(text: str) -> Optional[dict]:
     # Si no pudimos parsear nada
     return None
 
+def _parse_image_paths_from_crew_output(raw: str) -> Dict[str, str]:
+    """
+    Extrae pares 'Nombre del sospechoso' -> 'ruta/de/la/imagen.png'
+    desde el texto de Final Output de la Crew.
+
+    Formatos esperados en raw, por ejemplo:
+
+      - Arthur Sterling:
+        src/cluedogenai/generated_images/Arthur_Sterling_Lead_Project_Manager.png
+    """
+    mapping: Dict[str, str] = {}
+    if not raw:
+        return mapping
+
+    # Por si el string viene con tabs o muchos espacios
+    raw = raw.replace("\t", "    ")
+
+    # Regex un poco más permisivo
+    pattern = r"-\s*(.+?):\s*[\r\n]+[ \t]*(src/cluedogenai[^\s]+\.png)"
+
+    for m in re.finditer(pattern, raw):
+        name = m.group(1).strip()
+        path = m.group(2).strip()
+        mapping[name] = path
+
+    print("🔍 Parsed suspect_images from Crew output:", mapping)
+    return mapping
+
+
+
 def _strip_html_tags(text: str) -> str:
     """Elimina cualquier etiqueta HTML básica de un string."""
     if not text:
@@ -168,6 +198,26 @@ def generate_case_with_crew() -> Dict:
         result = crew.kickoff(inputs=crew_inputs)
     except Exception as e:
         raise RuntimeError(f"Error calling CrewAI: {e}") from e
+
+    # ========= NUEVO: intentar capturar el texto donde vienen las rutas =========
+    overall_text = ""
+
+    # Probamos varios atributos conocidos
+    for attr in ("final_output", "output", "raw", "summary"):
+        if hasattr(result, attr):
+            val = getattr(result, attr)
+            if isinstance(val, str) and "src/cluedogenai" in val:
+                overall_text = val
+                break
+
+    if not overall_text:
+        # Fallback al str(result) por si la librería lo serializa ahí
+        s = str(result)
+        if "src/cluedogenai" in s:
+            overall_text = s
+
+    image_map = _parse_image_paths_from_crew_output(overall_text)
+    st.session_state.suspect_images = image_map  # lo guardamos en sesión
 
     # Según versión de CrewAI, tasks_output puede ser lista o dict
     tasks_out = getattr(result, "tasks_output", None)
@@ -304,22 +354,32 @@ def generate_case_with_crew() -> Dict:
     if not guilty_name:
         raise RuntimeError("Could not determine guilty_name from characters JSON.")
 
-    # Normalizamos sospechosos al formato interno del juego
+        # Mapa nombre -> ruta de imagen (si existe)
+        # Mapa nombre -> ruta de imagen (si existe)
+    image_map = st.session_state.get("suspect_images", {})
+
     suspects = []
     for s in suspects_raw:
-        suspects.append(
-            {
-                "name": s.get("name", "Unknown Suspect"),
-                "role": s.get("role", ""),
-                "personality": s.get("personality", ""),
-                "secret": s.get("secret") or s.get("secret_motivation", ""),
-                "guilty": bool(
-                    s.get("guilty", False)
-                    or s.get("name") == guilty_name
-                    or s.get("id") == characters_json.get("killer_id")
-                ),
-            }
-        )
+        name = s.get("name", "Unknown Suspect")
+        suspect_dict = {
+            "name": name,
+            "role": s.get("role", ""),
+            "personality": s.get("personality", ""),
+            "secret": s.get("secret") or s.get("secret_motivation", ""),
+            "guilty": bool(
+                s.get("guilty", False)
+                or s.get("name") == guilty_name
+                or s.get("id") == characters_json.get("killer_id")
+            ),
+        }
+
+        img_rel = image_map.get(name)
+        if img_rel:
+            suspect_dict["image_path"] = img_rel
+
+        suspects.append(suspect_dict)
+
+
 
     # Construimos el case final que usará todo el juego
     case = dict(base_case)
@@ -920,6 +980,27 @@ def render_game() -> None:
             """,
             unsafe_allow_html=True,
         )
+
+                # Mostrar imagen del sospechoso si existe
+        img_rel = s.get("image_path")
+        if img_rel:
+            if not os.path.isabs(img_rel):
+                abs_path = os.path.join(CURRENT_DIR, img_rel)
+            else:
+                abs_path = img_rel
+
+            print(f"🖼 Resolviendo imagen para {s['name']}: {abs_path}  exists={os.path.exists(abs_path)}")
+
+            if os.path.exists(abs_path):
+                st.image(
+                    abs_path,
+                    caption=s["name"],
+                    use_column_width=True,
+                )
+            else:
+                st.caption(f"(No image file found at {img_rel})")
+
+
 
         st.markdown("#### Conversation")
         render_conversation(selected)

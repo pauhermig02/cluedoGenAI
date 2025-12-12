@@ -44,12 +44,12 @@ class Cluedogenai():
     @agent
     def vision_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['vision_agent'],
-            # AQUI ES DONDE LE DAMOS LA HERRAMIENTA AL AGENTE:
-            tools=[CharacterImageGeneratorTool()], 
-            verbose=True
-            allow_delegation=False #probar a cambiar a true por si le viene mejor nutrirse del resto de agentes pero más riesgo de alucinaciones
+            config=self.agents_config['vision_agent'],  # type: ignore[index]
+            tools=[CharacterImageGeneratorTool()],
+            verbose=True,
+            allow_delegation=False,  # probar a cambiar a True si quieres que delegue
         )
+
     
     @agent
     def audio_agent(self) -> Agent: # Delete if we delete this agent

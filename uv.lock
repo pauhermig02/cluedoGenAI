@@ -481,10 +481,14 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "crewai", extra = ["google-genai", "tools"] },
+    { name = "huggingface-hub" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "crewai", extras = ["google-genai", "tools"], specifier = "==1.6.1" }]
+requires-dist = [
+    { name = "crewai", extras = ["google-genai", "tools"], specifier = "==1.6.1" },
+    { name = "huggingface-hub", specifier = ">=1.2.1" },
+]
 
 [[package]]
 name = "colorama"
