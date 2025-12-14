@@ -1,38 +1,69 @@
 ```json
 {
-  "scene_id": "OpeningScene_Discovery",
-  "location": "The 'Innovation Lab' at Veridian Dynamics Office",
-  "summary": "A violent storm rages outside, plunging the Veridian Dynamics office into a flickering half-light. The player, either working late or arriving for an urgent matter, is met by a panicked security guard, Marcus, who leads them to the Innovation Lab. There, Dr. Aris Thorne, the brilliant but enigmatic lead AI architect, is found dead amidst a tangle of sparking, damaged smart equipment, the victim of a supposed 'accident'.",
+  "scene_id": "InitialEncounter_OfficeFloor",
+  "location": "Main Office Floor - Elias Thorne's Desk",
+  "summary": "The player stands before the gruesome scene of Elias Thorne's murder, an ornate letter opener embedded in his back. The player's question, 'Who are you?', startles a figure already present, casting immediate suspicion and initiating the first critical interaction at the crime scene. The air is thick with the scent of ozone and the weight of sudden death.",
   "present_characters": [
-    "Marcus O'Connell",
-    "Player Character"
+    "Player",
+    "Detective Harding"
   ],
   "beats": [
-    "Player arrives/is at the office, power flickers erratically, an alarm blares briefly before cutting out.",
-    "Marcus O'Connell, visibly agitated and disheveled, rushes towards the player, demanding immediate help and exclaiming about a 'terrible accident'.",
-    "Marcus explains he found something 'unbelievable' in the Innovation Lab and needs someone else to confirm, expressing fear and confusion.",
-    "Player and Marcus proceed to the Innovation Lab, a tense, dim walk through the deserted, storm-battered office corridors.",
-    "Discovery of Dr. Aris Thorne's body, slumped over a console, surrounded by severely damaged robotic equipment and live, sparking wires.",
-    "Marcus, overwhelmed and pale, immediately declares it a tragic 'equipment malfunction', urging caution around the live wires.",
-    "Player has their first opportunity to examine the immediate scene and the victim, while Marcus struggles to regain composure."
+    {
+      "beat_id": "player_questions_stranger",
+      "description": "The player's question, 'Who are you?', cuts through the unsettling silence of the office, directed at the figure standing near the victim."
+    },
+    {
+      "beat_id": "harding_startled_reaction",
+      "description": "Detective Harding, who was previously surveying the scene or focused on something near the body, visibly stiffens and spins around, their expression a mix of surprise and guarded scrutiny."
+    },
+    {
+      "beat_id": "harding_introduces_self",
+      "description": "Harding quickly regains composure, their posture becoming more official. 'Detective Harding,' they state, their voice firm but not aggressive. 'And you are...?'"
+    },
+    {
+      "beat_id": "harding_acknowledges_victim",
+      "description": "Harding's gaze flicks to the victim, a grim acknowledgment in their eyes, before returning to the player, subtly implying the seriousness of the situation."
+    },
+    {
+      "beat_id": "player_is_on_the_spot",
+      "description": "The player is now prompted to identify themselves and explain their presence, under the watchful eye of a presumed authority figure."
+    }
   ],
   "visible_clues": [
-    "Dr. Aris Thorne's body, clearly deceased, with visible burns and contusions suggesting electrocution or impact from heavy machinery.",
-    "A state-of-the-art robotic arm prototype, partially dismantled and emitting small sparks, one of its powerful manipulators bent at an unnatural, stressed angle.",
-    "A high-end server rack, its reinforced glass panel shattered inwards, revealing damaged internal components and scorch marks.",
-    "A puddle of spilled, cold coffee or energy drink near Thorne's outstretched, rigid hand.",
-    "A small, jagged metallic shard, unlike any common office material, glinting subtly near the victim's feet, partially hidden by debris.",
-    "The relentless flickering of emergency overhead lights, creating disorienting light and shadow play."
+    {
+      "clue_id": "victim_body_position",
+      "description": "Elias Thorne, slumped over his keyboard, head resting awkwardly on his arms, a macabre tableau."
+    },
+    {
+      "clue_id": "murder_weapon",
+      "description": "An elegant, silver-handled letter opener, possibly decorative rather than utilitarian, protruding from Elias's back."
+    },
+    {
+      "clue_id": "desk_clutter",
+      "description": "An overturned coffee mug with a dark, still-wet stain spreading across the desk, next to a half-eaten granola bar and several technical manuals."
+    },
+    {
+      "clue_id": "computer_screens",
+      "description": "Three large monitors flicker with lines of code and complex data visualizations, one displaying an error message."
+    },
+    {
+      "clue_id": "ozone_scent",
+      "description": "A faint but distinct scent of ozone hangs in the air, mingling with the stale smell of late-night coffee."
+    },
+    {
+      "clue_id": "harding_badge",
+      "description": "A discreet but official-looking badge or ID clip visible on Detective Harding's belt or jacket lapel."
+    }
   ],
-  "hidden_tension": "Marcus's immediate 'accident' assessment feels overly defensive, hinting that he either suspects foul play himself and is trying to contain the situation, or he's deliberately trying to deflect attention. The state of the equipment and the unique shard suggest more than a simple malfunction.",
-  "music_mood": "Tense and Eerie",
+  "hidden_tension": "Both the player and Detective Harding are instantly sizing each other up, each questioning the other's true motive for being at the crime scene. An unspoken professional rivalry or suspicion of involvement simmers beneath Harding's composed exterior.",
+  "music_mood": "Eerie Silence with Undercurrents of Tension",
   "visual_hooks": [
-    "Torrential rain lashing against large office windows, intermittently illuminated by distant lightning flashes, casting dramatic silhouettes.",
-    "Flickering fluorescent lights above, occasionally plunging the Innovation Lab into near-darkness, then back to a harsh, strobing glow that distorts perceptions.",
-    "The dramatic, almost monstrous, silhouette of advanced, damaged robotics against the dim, stormy backdrop, appearing menacing and chaotic.",
-    "The unnerving stillness of Dr. Thorne's body, starkly contrasted by the constant, erratic sparks and hums from the damaged equipment.",
-    "A single, faint emergency exit sign casting a sickly green glow down a deserted, water-streaked corridor leading to the lab, emphasizing isolation."
+    "The sharp, clinical glare of fluorescent lights reflecting off the polished office floor, creating long, distorted shadows.",
+    "The stark contrast between the lifeless, crumpled form of Elias Thorne and the vibrant, flickering data on his computer screens.",
+    "The glint of the silver letter opener, catching the light as the central, gruesome focal point.",
+    "Detective Harding's composed, yet watchful, expression framed against the sterile, empty cubicles of the late-night office.",
+    "The spreading dark stain of coffee on the desk, a small detail in the larger chaos."
   ],
-  "victim_name": "Dr. Aris Thorne"
+  "victim_name": "Elias Thorne"
 }
 ```

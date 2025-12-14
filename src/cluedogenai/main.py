@@ -2,6 +2,7 @@
 
 import sys
 import warnings
+import json
 
 from datetime import datetime
 
@@ -18,15 +19,21 @@ def run():
     """
     Run the crew.
     """
+    mock_blueprint = {"location": "Test Room", "victim_name": "Test Victim"}
+    mock_characters = [{"name": "Test Suspect", "role": "Tester"}]
+
     inputs = {
-        'topic': 'AI LLMs',
+        'topic': 'AI Murder Mystery',
         'current_year': str(datetime.now().year),
-        'game_state': 'Start of the game. Do not reveal any clues yet.',
-        'player_action': 'Question asked by the player'
+        'game_state': 'Este es un estado de juego de prueba estático.',
+        'player_action': 'El jugador pregunta: ¿Quién eres?',
+        # AÑADIR LAS CLAVES QUE FALTABAN PARA QUE NO DE ERROR DE KEYERROR
+        'scene_blueprint': json.dumps(mock_blueprint),
+        'characters': json.dumps(mock_characters)
     }
 
     try:
-        Cluedogenai().crew().kickoff(inputs=inputs)
+        Cluedogenai().setup_crew().kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 

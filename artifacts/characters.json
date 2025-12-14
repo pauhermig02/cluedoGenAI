@@ -2,76 +2,76 @@
   "suspects": [
     {
       "id": "suspect_1",
-      "name": "Marcus O'Connell",
-      "role": "Security Guard",
-      "age": 48,
-      "personality": "Jumpy and easily flustered, but beneath the surface, there's a deep-seated resentment and a sense of territoriality over his perceived duties.",
+      "name": "Marcus Thorne",
+      "age": 38,
+      "role": "Senior Project Manager",
+      "personality": "Ambitious and highly organized, Marcus often projects an air of calm efficiency, but beneath the surface, he harbors a deep-seated resentment towards perceived professional injustices.",
       "physical_description": {
         "build": "fit",
-        "face": "weathered face with tired eyes and a perpetually worried expression",
-        "hair": "short-cropped brown hair, slightly thinning at the crown",
-        "upper_clothing": "dark blue security uniform shirt",
-        "distinctive_features": "a faint, jagged scar above his right eyebrow, always nervously adjusting his collar"
+        "face": "sharp, angular features with a perpetually serious expression",
+        "hair": "short, neatly combed dark brown hair, slightly thinning at the temples",
+        "upper_clothing": "navy blue blazer over a crisp white shirt",
+        "distinctive_features": "a habit of constantly adjusting his tie and tapping a perfectly sharpened pencil"
       },
-      "clue_object": "A worn, dog-eared copy of the company's internal 'Employee Conduct Policy' manual, clutched tightly in his hand.",
-      "secret_motivation": "Believed Dr. Thorne was exposing company secrets or violating critical protocols, undermining the security he felt responsible for. He saw himself as protecting the company from internal threats.",
-      "alibi": "Claims he was doing his routine security rounds, found the body in the Innovation Lab, and immediately called for assistance.",
+      "clue_object": "A perfectly sharpened pencil, almost obsessively so, which he grips tightly.",
+      "secret_motivation": "Believed Elias was actively sabotaging his career advancement by undermining his projects and stealing credit for his ideas.",
+      "alibi": "Claims he was working late on a critical deadline from his home office, away from the company network.",
       "guilty": true
     },
     {
       "id": "suspect_2",
-      "name": "Maya Sharma",
-      "role": "Senior AI Engineer",
-      "age": 32,
-      "personality": "Brilliant and intensely focused, often perceived as aloof. She values intellectual challenge above all else and harbors a quiet disdain for inefficiency.",
+      "name": "Lena Petrova",
+      "age": 29,
+      "role": "Lead Software Engineer",
+      "personality": "Introverted and brilliant, Lena often seems lost in thought, preferring the logic of code to social interaction, yet she possesses a fierce loyalty to her trusted few.",
       "physical_description": {
         "build": "skinny",
-        "face": "sharp features with intense, analytical dark eyes and a often-frowning brow",
-        "hair": "long black hair tied in a messy, functional bun",
-        "upper_clothing": "bright green t-shirt",
-        "distinctive_features": "a subtle, almost imperceptible tremor in her left hand when stressed, rarely makes eye contact"
+        "face": "perpetually tired eyes behind thick, black-rimmed glasses, often smudged",
+        "hair": "messy, dark brown hair often falling across her face",
+        "upper_clothing": "charcoal grey hoodie, slightly worn at the cuffs",
+        "distinctive_features": "constantly pushing her glasses up her nose, a faint ink stain on her index finger"
       },
-      "clue_object": "A high-precision stylus pen, twirling restlessly between her fingers as if debugging a complex problem.",
-      "secret_motivation": "Discovered Dr. Thorne was taking credit for her crucial algorithmic breakthroughs and was about to present them as his own at an upcoming conference, threatening her career advancement.",
-      "alibi": "Was working remotely on a critical bug fix for a different project, claims to have been online the entire evening, collaborating with an overseas colleague via video call.",
+      "clue_object": "A worn, dog-eared copy of a complex programming manual, its pages filled with annotations.",
+      "secret_motivation": "Elias had stumbled upon her clandestine side-project, an unsanctioned AI model, which could jeopardize her employment and her precarious visa status.",
+      "alibi": "Attended a late-night, private coding meetup for an open-source project across town.",
       "guilty": false
     },
     {
       "id": "suspect_3",
-      "name": "Liam Chen",
-      "role": "Hardware Development Lead",
-      "age": 39,
-      "personality": "Reserved and detail-oriented, with a perfectionist streak. He's passionate about the physical manifestation of technology and feels undervalued compared to the software team.",
+      "name": "Vivian Chen",
+      "age": 45,
+      "role": "Head of Sales",
+      "personality": "Outgoing and effortlessly charming, Vivian excels at navigating complex social and professional landscapes, but underneath her polished exterior lies a desperate need for financial stability.",
       "physical_description": {
         "build": "fit",
-        "face": "serious expression with a perpetually furrowed brow, often peering over his glasses",
-        "hair": "neatly styled, short light brown hair",
-        "upper_clothing": "grey polo shirt",
-        "distinctive_features": "oil stains on his fingertips despite apparent cleanliness, often adjusts his thick-rimmed glasses"
+        "face": "a practiced, engaging smile that doesn't quite reach her eyes, subtle lines of stress around them",
+        "hair": "perfectly styled, glossy blonde bob, always in place",
+        "upper_clothing": "forest green silk blouse with delicate pleats",
+        "distinctive_features": "wears an expensive, minimalist watch and frequently smooths her skirt or checks her phone"
       },
-      "clue_object": "A small, specialized torque wrench, which he absently clicks open and shut, its metallic sound barely audible.",
-      "secret_motivation": "Was fiercely protective of his robotic arm prototypes and suspected Dr. Thorne was recklessly pushing experimental limits, jeopardizing the integrity of his designs and his professional reputation.",
-      "alibi": "Was in the workshop, located on a different floor, performing emergency maintenance on another prototype that had a power surge during the storm, has timestamped log entries from equipment diagnostics.",
+      "clue_object": "A high-end, slightly scratched smartwatch, which she compulsively glances at.",
+      "secret_motivation": "Elias was about to expose her inflated sales figures and a questionable client deal, threatening her substantial year-end bonus and her entire career.",
+      "alibi": "Claims she was hosting an exclusive, late-night client dinner at a high-end restaurant downtown.",
       "guilty": false
     },
     {
       "id": "suspect_4",
-      "name": "Chloe Davis",
-      "role": "Project Manager",
-      "age": 35,
-      "personality": "Energetic and outwardly optimistic, but deeply pragmatic and financially driven. She prioritizes project deadlines and budget adherence above creative whims.",
+      "name": "David Miller",
+      "age": 52,
+      "role": "HR Specialist",
+      "personality": "Seemingly calm and empathetic, David projects an air of professionalism, but he is internally stressed by the weight of corporate secrets and ethical dilemmas he's forced to navigate.",
       "physical_description": {
-        "build": "fit",
-        "face": "expressive face with a quick, nervous smile that doesn't quite reach her eyes",
-        "hair": "shoulder-length blonde hair, perfectly straightened",
-        "upper_clothing": "vibrant purple blazer",
-        "distinctive_features": "always wears a high-end smartwatch and several intricate silver rings on her right hand"
+        "build": "fat",
+        "face": "a soft, worried expression, with deep-set eyes that often look burdened",
+        "hair": "short, neatly parted red hair, thinning on top",
+        "upper_clothing": "burgundy knitted cardigan over a collared beige shirt",
+        "distinctive_features": "a slight, nervous tremor in his hands, often fidgeting with a small object in his pocket"
       },
-      "clue_object": "A small, elaborately designed stress ball in the shape of a gear, which she squeezes rhythmically, almost unconsciously.",
-      "secret_motivation": "Discovered Dr. Thorne was secretly diverting significant project funds for highly speculative personal research, threatening to derail a critical company initiative and expose her lax oversight to investors.",
-      "alibi": "Claims she was at a late-night video conference call with overseas investors, though her connection was reportedly spotty due to the severe storm.",
+      "clue_object": "A small, unmarked grey stress ball, squeezed rhythmically in his hand.",
+      "secret_motivation": "Elias was threatening to go public with a past sexual harassment claim that the company, and David personally, had quietly suppressed, which would ruin his career and the company's reputation.",
+      "alibi": "Insists he was home battling a severe migraine, having left work early.",
       "guilty": false
     }
   ],
-  "guilty_name": "Marcus O'Connell"
+  "guilty_name": "Marcus Thorne"
 }
