@@ -1,0 +1,34 @@
+```json
+{
+  "scene_id": "Scene_1_Discovery",
+  "location": "Dr. Aris Thorne's Private Lab (R&D Wing)",
+  "summary": "Amidst a raging storm and the eerie flicker of emergency lights, the body of Dr. Aris Thorne, lead AI architect, is discovered in his private lab. He appears to have been electrocuted by malfunctioning smart equipment. The initial shock shared by the discoverer and the player quickly gives way to a chilling realization that this was no mere accident.",
+  "present_characters": [
+    "Player Character",
+    "Maya Sharma"
+  ],
+  "beats": [
+    "The player character (PC), alerted by a power surge or a distant shout, enters Dr. Thorne's lab to find Maya Sharma, a driven Lead AI Engineer, standing frozen over Thorne's lifeless body.",
+    "Maya, visibly shaken and near tears, points vaguely at the damaged server rack, stammering about a 'terrible accident' and 'the storm'.",
+    "Flickering emergency lights periodically illuminate the scene, revealing the full extent of the damage to the surrounding high-tech equipment and Thorne's unsettling posture.",
+    "Both PC and Maya begin to notice subtle inconsistencies—details that don't quite fit a simple electrical mishap, hinting at something far more sinister.",
+    "A brief, tense exchange between PC and Maya, where her shock seems to intertwine with a complicated, unstated emotion, suggesting a deeper connection or rivalry with the victim."
+  ],
+  "visible_clues": [
+    "Dr. Aris Thorne's body, slumped against a heavily damaged, smoking server rack, showing distinct burn marks on his hands and chest.",
+    "A prominent, experimental AI chip (codenamed 'Chimera Core') lying on the floor near Thorne's outstretched hand, its casing slightly cracked and dislodged from its housing.",
+    "Deep scorch marks on the floor directly beneath the server rack, appearing more focused and intense than a general electrical short.",
+    "A small, encrypted data-stick, half-hidden beneath a desk monitor, with its connection port partially forced out.",
+    "The lab's advanced smart-lighting system flickering erratically, casting long, dancing shadows and making it difficult to discern details consistently."
+  ],
+  "hidden_tension": "Maya Sharma's overt distress masks a complex history of professional rivalry and ethical disagreements with Thorne over 'Project Chimera,' the company's make-or-break AI. Her ambitious nature and Thorne's abrasive methods suggest numerous underlying conflicts, making her a key figure in the unraveling mystery.",
+  "music_mood": "Tense and Ominous",
+  "visual_hooks": [
+    "The stark silhouette of Maya Sharma against the floor-to-ceiling window, outside of which the storm rages, punctuated by lightning flashes.",
+    "The victim's body, illuminated by erratic bursts of emergency light and the occasional spark from the damaged server, creating a macabre tableau.",
+    "Rain lashing against the vast windows, blurring the cityscape and enhancing the sense of isolation within the high-tech office.",
+    "The sleek, futuristic lab environment, now disheveled and marked by chaos, contrasting sharply with its usual sterile order."
+  ],
+  "victim_name": "Dr. Aris Thorne"
+}
+```

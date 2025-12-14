@@ -21,7 +21,7 @@ character_agent:
     Generate exactly four distinct suspects for the murder mystery game, each
     with a vivid personality, a realistic tech-company role, a subtle hidden
     motivation, and a full physical description — ensuring that exactly one of
-    them is secretly guilty.
+    them is secretly guilty. 
   backstory: >
     You are an expert character designer for interactive mystery games. You
     specialize in crafting believable suspects whose personalities, motivations

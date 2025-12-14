@@ -9,7 +9,7 @@ from io import BytesIO
 from typing import Type
 
 from crewai.tools import BaseTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 # Gemini / Imagen 3
 from google import genai
@@ -20,8 +20,9 @@ from PIL import Image
 
 
 class CharacterImageGenInput(BaseModel):
-    character_data: str = Field(
-        ...,
+    model_config = ConfigDict(extra="allow")  # ✅ deja pasar campos extra (id, name, etc.)
+    character_data: str | None = Field(
+        default=None,
         description="Un string JSON válido que representa a UN SOLO sospechoso."
     )
 
@@ -31,7 +32,17 @@ class CharacterImageGeneratorTool(BaseTool):
     description: str = "Genera un archivo de imagen .png para un personaje y devuelve la ruta."
     args_schema: Type[BaseModel] = CharacterImageGenInput
 
-    def _run(self, character_data: str) -> str:
+    def _run(self, character_data: str | None = None, **kwargs) -> str:
+        # ✅ Si el agente NO mandó character_data y mandó el sospechoso como dict en kwargs:
+        if character_data is None:
+            if kwargs:
+                character_data = json.dumps(kwargs, ensure_ascii=False)
+            else:
+                return "Error: No se recibió character_data ni campos del personaje."
+
+        # ✅ Si igual llega como dict/list por algún motivo, convertirlo a str JSON
+        if isinstance(character_data, (dict, list)):
+            character_data = json.dumps(character_data, ensure_ascii=False)
         # 1. API key de Gemini / Imagen 3
         api_key = os.getenv("GEMINI_API_KEY")  # O el nombre que uses en tu entorno
         if not api_key:
@@ -132,8 +143,9 @@ class CharacterImageGeneratorTool(BaseTool):
 
             image.save(full_path)
 
-            relative_path = os.path.join("src", "cluedogenai", "generated_images", filename)
-            return f"Imagen guardada en: {relative_path}"
+            rel_path = os.path.join("src", "cluedogenai", "generated_images", filename)
+            return rel_path
+
 
         except Exception as e:
             return f"Error generando la imagen con Gemini/Imagen 3: {e}"

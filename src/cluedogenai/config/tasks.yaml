@@ -18,7 +18,10 @@ create_scene_blueprint:
     - "hidden_tension": 1–2 sentences about underlying conflict/secrets
     - "music_mood": a simple label for the audio agent (e.g. "tense", "calm")
     - "visual_hooks": list of strong visual elements for the vision agent
+    - "victim_name": full name of the victim
   agent: narrative_agent
+  output_file: artifacts/scene_blueprint.json
+  
 
 define_characters:
   description: >
@@ -48,7 +51,6 @@ define_characters:
             "upper_clothing": "specific color + garment (must be a unique color per suspect)",
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
-          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "physical_description": {
             "build": "skinny|fit|fat",
@@ -76,7 +78,6 @@ define_characters:
             "upper_clothing": "specific color + garment (must be a unique color per suspect)",
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
-          "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "physical_description": {
             "build": "skinny|fit|fat",
@@ -151,6 +152,7 @@ define_characters:
   agent: character_agent
   context:
     - create_scene_blueprint
+  output_file: artifacts/characters.json
 
 
 generate_suspect_dialogue:
@@ -196,25 +198,34 @@ design_scene_visuals:
   description: >
     You will receive the output from 'define_characters', which is a JSON object
     containing a list of exactly 4 suspects in the "suspects" array.
-    
-    Your goal is to generate a visual portrait for EACH suspect using the 
+
+    Your goal is to generate a visual portrait for EACH suspect using the
     'Generate Character Image' tool.
-    
+
     Step-by-step instructions:
     1. Parse the incoming JSON to find the "suspects" list.
     2. Iterate through every suspect in that list.
-    3. For each suspect, extract their individual data object (including name, 
+    3. For each suspect, extract their individual data object (including name,
        physical_description, and clue_object) as a JSON string.
     4. Call the 'Generate Character Image' tool passing that individual JSON string.
-    
+
     CRITICAL: You must execute the tool exactly 4 times (once per suspect).
   expected_output: >
-    A final summary report confirming that 4 images have been successfully 
-    generated. The report must list the names of the suspects and the 
-    file paths returned by the tool (e.g., "src/cluedogenai/generated_images/...").
+    Output MUST be ONLY valid JSON (no markdown, no extra text) with this structure:
+    {
+      "suspect_images": {
+        "Dr. Aris Thorne": "src/cluedogenai/generated_images/Dr_Aris_Thorne_Lead_Robotics_Engineer.png",
+        "Alex Chen": "src/cluedogenai/generated_images/Alex_Chen_Cybersecurity_Analyst.png"
+      },
+      "failed": {
+        "Maya Sharma": "security_filters",
+        "Chloe Davies": "security_filters"
+      }
+    }
   agent: vision_agent
   context:
     - define_characters
+  output_file: artifacts/suspect_images.json
 
 curate_scene_audio:
   description: >

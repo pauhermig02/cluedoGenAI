@@ -12,7 +12,6 @@ class Cluedogenai():
     """Cluedogenai crew"""
 
     agents: List[BaseAgent]
-    tasks: List[Task]
 
     # Learn more about YAML configuration files here:
     # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended

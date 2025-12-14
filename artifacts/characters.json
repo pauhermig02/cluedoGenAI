@@ -1,0 +1,77 @@
+{
+  "suspects": [
+    {
+      "id": "suspect_1",
+      "name": "Maya Sharma",
+      "role": "Lead AI Engineer",
+      "age": 32,
+      "personality": "Driven and intensely ambitious, Maya hides a deep-seated professional jealousy and ethical frustration beneath a composed exterior, now visibly fractured by the incident.",
+      "physical_description": {
+        "build": "fit",
+        "face": "Sharp, angular features with observant, dark eyes that currently hold a haunted look.",
+        "hair": "Long, straight black hair, tied back in a neat, professional ponytail.",
+        "upper_clothing": "Navy blue silk blouse",
+        "distinctive_features": "A sleek, minimalist silver smart ring on her right index finger, which she occasionally twists."
+      },
+      "clue_object": "A slightly crumpled printout of a detailed ethical review report for 'Project Chimera,' tucked into her hand, its edges worn from nervous handling.",
+      "secret_motivation": "She secretly believes Thorne stole her initial concepts for 'Project Chimera' and was about to expose his unethical data acquisition methods, which would have ruined her career too if it came out.",
+      "alibi": "Claims she was working late in her adjacent lab, heard a power surge, and came to investigate, finding Thorne.",
+      "guilty": false
+    },
+    {
+      "id": "suspect_2",
+      "name": "Edward \"Eddie\" Finch",
+      "role": "Senior Project Manager",
+      "age": 45,
+      "personality": "A perpetually stressed but outwardly jovial man, Eddie is obsessed with deadlines and budgets, often seen as a peacemaker but harbors a deep-seated fear of professional failure.",
+      "physical_description": {
+        "build": "fat",
+        "face": "Round, flushed face, with tired eyes behind wire-rimmed glasses and a perpetually worried frown line.",
+        "hair": "Receding hairline, with thinning, light brown hair carefully combed over.",
+        "upper_clothing": "Forest green polo shirt",
+        "distinctive_features": "Constantly adjusts his too-tight company lanyard, revealing faint sweat stains on his collar."
+      },
+      "clue_object": "A small, dog-eared notebook filled with frantic, color-coded project notes and a hidden, past-due utility bill stapled inside.",
+      "secret_motivation": "He heavily invested in Thorne's startup before it was acquired, and Thorne was threatening to expose a financial irregularity that would cost Eddie his job and ruin his family.",
+      "alibi": "Was in the breakroom making coffee, heard the power flicker, and then the commotion from Thorne's lab.",
+      "guilty": false
+    },
+    {
+      "id": "suspect_3",
+      "name": "Chloe Zhao",
+      "role": "Infrastructure Engineer",
+      "age": 28,
+      "personality": "Quiet and exceptionally observant, Chloe is fiercely protective of her work and prides herself on her meticulous attention to detail, easily annoyed by perceived incompetence.",
+      "physical_description": {
+        "build": "skinny",
+        "face": "Delicate features with sharp, intelligent eyes, often narrowed slightly as if analyzing something. A small, almost imperceptible scar above her left eyebrow.",
+        "hair": "Short, choppy auburn bob, often tucked behind her ears.",
+        "upper_clothing": "Bright red hooded sweatshirt",
+        "distinctive_features": "Wears a pair of worn, fingerless gloves, even indoors, and stands with a slight, defensive hunch."
+      },
+      "clue_object": "A specialized, high-gauge fiber optic cable coiled nervously in her hands, its connector end slightly bent.",
+      "secret_motivation": "Thorne routinely blamed her for minor network glitches to cover his own software bugs, and she had discovered a critical vulnerability in his lab's experimental hardware that he refused to address, fearing it would delay his project.",
+      "alibi": "Was in the server room on a different floor, performing routine maintenance, when the power surge hit.",
+      "guilty": false
+    },
+    {
+      "id": "suspect_4",
+      "name": "Marcus Bell",
+      "role": "Junior AI Research Assistant",
+      "age": 23,
+      "personality": "Outwardly shy and deferential, Marcus possesses a brilliant but highly insecure mind, desperate for recognition and often overshadowed by more assertive colleagues.",
+      "physical_description": {
+        "build": "skinny",
+        "face": "Soft, boyish features with wide, anxious blue eyes that dart around nervously. A scattering of freckles across his nose.",
+        "hair": "Messy, light brown curly hair, often falling into his eyes.",
+        "upper_clothing": "Pale yellow t-shirt",
+        "distinctive_features": "Wears oversized, noise-canceling headphones around his neck, even when not in use, and habitually bites his lower lip."
+      },
+      "clue_object": "A small, highly modified screwdriver (with electrical tape on the handle for better grip) visible in his back pocket, and he keeps unconsciously rubbing his thumb against a small burn mark on his palm.",
+      "secret_motivation": "Desperate to prove his worth, Marcus discovered a critical flaw in the 'Chimera Core' that Thorne was ignoring. He attempted to 'fix' it himself, convinced he could impress Thorne, but instead caused a fatal short circuit during the storm.",
+      "alibi": "Claims he was in the downstairs cafeteria, taking a late dinner break, and only heard the commotion after the power flickered.",
+      "guilty": true
+    }
+  ],
+  "guilty_name": "Marcus Bell"
+}
