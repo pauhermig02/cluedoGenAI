@@ -61,7 +61,7 @@ define_characters:
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
-          "guilty": false
+          "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
         },
         {
           "id": "suspect_2",
@@ -88,7 +88,7 @@ define_characters:
             },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
-          "guilty": false
+          "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
         },
         {
           "id": "suspect_3",
@@ -108,7 +108,7 @@ define_characters:
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "alibi": "Short description of where they claim to be during the murder window",
-          "guilty": false
+          "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
         },
         {
           "id": "suspect_4",
@@ -128,7 +128,7 @@ define_characters:
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "alibi": "Short description of where they claim to be during the murder window",
-          "guilty": true
+          "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
         }
       ],
       "guilty_name": "Full Name of the guilty suspect"
@@ -147,6 +147,7 @@ define_characters:
     - Do not include explanations, commentary, or meta-reasoning.
     - Exactly 4 suspects.
     - Exactly ONE of them must have "guilty": true.
+    - The "guilty" character can be anyone, make it random, not always the same number of character.
     - "guilty_name" must match the "name" of the guilty suspect.
     - Final output must be valid JSON, with no markdown and no trailing commas.
   agent: character_agent
@@ -226,45 +227,3 @@ design_scene_visuals:
   context:
     - define_characters
   output_file: artifacts/suspect_images.json
-
-curate_scene_audio:
-  description: >
-    Using the current scene_blueprint, its music_mood and the emotional tone
-    of the latest suspect dialogue, propose a soundtrack and soundscape for
-    this scene. Focus on:
-    1. Musical genre, mood, tempo and instrumentation
-    2. Tension level (low/medium/high)
-    3. Ambient sound effects that fit the location and situation
-  expected_output: >
-    A JSON object with:
-    - "music_tags": list of tags describing genre, mood, tempo, instruments
-    - "sfx_tags": list of short descriptions of sound effects
-    - "prompt_snippet": 1–2 sentences as a prompt for an AI music generator
-    - "intensity_level": "low" | "medium" | "high" tension
-  agent: audio_agent
-  context:
-    - create_scene_blueprint
-    - generate_suspect_dialogue
-
-game_play_director_step:
-  description: >
-    Decide what should happen next in the game flow based on the global
-    game_state, the defined characters and the latest interaction. Focus on:
-    1. Which agent should act next (narrative, dialogue, vision, audio, etc.)
-    2. Whether to escalate tension, introduce a new scene, or deepen an existing one
-    3. When to offer hints or move towards the final reveal
-  expected_output: >
-    A JSON control object with:
-    - "next_step": high-level description of the next action
-    - "target_agent": which agent should be called next
-    - "reasoning": brief justification for this choice
-    - "flags": optional control flags such as
-               "approach_final_reveal": true/false,
-               "offer_hint": true/false
-  agent: director_agent
-  context:
-    - create_scene_blueprint
-    - define_characters
-    - generate_suspect_dialogue
-    - design_scene_visuals
-    - curate_scene_audio

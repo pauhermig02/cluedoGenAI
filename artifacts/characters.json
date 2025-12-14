@@ -2,76 +2,76 @@
   "suspects": [
     {
       "id": "suspect_1",
-      "name": "Maya Sharma",
-      "role": "Lead AI Engineer",
-      "age": 32,
-      "personality": "Driven and intensely ambitious, Maya hides a deep-seated professional jealousy and ethical frustration beneath a composed exterior, now visibly fractured by the incident.",
+      "name": "Marcus O'Connell",
+      "role": "Security Guard",
+      "age": 48,
+      "personality": "Jumpy and easily flustered, but beneath the surface, there's a deep-seated resentment and a sense of territoriality over his perceived duties.",
       "physical_description": {
         "build": "fit",
-        "face": "Sharp, angular features with observant, dark eyes that currently hold a haunted look.",
-        "hair": "Long, straight black hair, tied back in a neat, professional ponytail.",
-        "upper_clothing": "Navy blue silk blouse",
-        "distinctive_features": "A sleek, minimalist silver smart ring on her right index finger, which she occasionally twists."
+        "face": "weathered face with tired eyes and a perpetually worried expression",
+        "hair": "short-cropped brown hair, slightly thinning at the crown",
+        "upper_clothing": "dark blue security uniform shirt",
+        "distinctive_features": "a faint, jagged scar above his right eyebrow, always nervously adjusting his collar"
       },
-      "clue_object": "A slightly crumpled printout of a detailed ethical review report for 'Project Chimera,' tucked into her hand, its edges worn from nervous handling.",
-      "secret_motivation": "She secretly believes Thorne stole her initial concepts for 'Project Chimera' and was about to expose his unethical data acquisition methods, which would have ruined her career too if it came out.",
-      "alibi": "Claims she was working late in her adjacent lab, heard a power surge, and came to investigate, finding Thorne.",
-      "guilty": false
+      "clue_object": "A worn, dog-eared copy of the company's internal 'Employee Conduct Policy' manual, clutched tightly in his hand.",
+      "secret_motivation": "Believed Dr. Thorne was exposing company secrets or violating critical protocols, undermining the security he felt responsible for. He saw himself as protecting the company from internal threats.",
+      "alibi": "Claims he was doing his routine security rounds, found the body in the Innovation Lab, and immediately called for assistance.",
+      "guilty": true
     },
     {
       "id": "suspect_2",
-      "name": "Edward \"Eddie\" Finch",
-      "role": "Senior Project Manager",
-      "age": 45,
-      "personality": "A perpetually stressed but outwardly jovial man, Eddie is obsessed with deadlines and budgets, often seen as a peacemaker but harbors a deep-seated fear of professional failure.",
+      "name": "Maya Sharma",
+      "role": "Senior AI Engineer",
+      "age": 32,
+      "personality": "Brilliant and intensely focused, often perceived as aloof. She values intellectual challenge above all else and harbors a quiet disdain for inefficiency.",
       "physical_description": {
-        "build": "fat",
-        "face": "Round, flushed face, with tired eyes behind wire-rimmed glasses and a perpetually worried frown line.",
-        "hair": "Receding hairline, with thinning, light brown hair carefully combed over.",
-        "upper_clothing": "Forest green polo shirt",
-        "distinctive_features": "Constantly adjusts his too-tight company lanyard, revealing faint sweat stains on his collar."
+        "build": "skinny",
+        "face": "sharp features with intense, analytical dark eyes and a often-frowning brow",
+        "hair": "long black hair tied in a messy, functional bun",
+        "upper_clothing": "bright green t-shirt",
+        "distinctive_features": "a subtle, almost imperceptible tremor in her left hand when stressed, rarely makes eye contact"
       },
-      "clue_object": "A small, dog-eared notebook filled with frantic, color-coded project notes and a hidden, past-due utility bill stapled inside.",
-      "secret_motivation": "He heavily invested in Thorne's startup before it was acquired, and Thorne was threatening to expose a financial irregularity that would cost Eddie his job and ruin his family.",
-      "alibi": "Was in the breakroom making coffee, heard the power flicker, and then the commotion from Thorne's lab.",
+      "clue_object": "A high-precision stylus pen, twirling restlessly between her fingers as if debugging a complex problem.",
+      "secret_motivation": "Discovered Dr. Thorne was taking credit for her crucial algorithmic breakthroughs and was about to present them as his own at an upcoming conference, threatening her career advancement.",
+      "alibi": "Was working remotely on a critical bug fix for a different project, claims to have been online the entire evening, collaborating with an overseas colleague via video call.",
       "guilty": false
     },
     {
       "id": "suspect_3",
-      "name": "Chloe Zhao",
-      "role": "Infrastructure Engineer",
-      "age": 28,
-      "personality": "Quiet and exceptionally observant, Chloe is fiercely protective of her work and prides herself on her meticulous attention to detail, easily annoyed by perceived incompetence.",
+      "name": "Liam Chen",
+      "role": "Hardware Development Lead",
+      "age": 39,
+      "personality": "Reserved and detail-oriented, with a perfectionist streak. He's passionate about the physical manifestation of technology and feels undervalued compared to the software team.",
       "physical_description": {
-        "build": "skinny",
-        "face": "Delicate features with sharp, intelligent eyes, often narrowed slightly as if analyzing something. A small, almost imperceptible scar above her left eyebrow.",
-        "hair": "Short, choppy auburn bob, often tucked behind her ears.",
-        "upper_clothing": "Bright red hooded sweatshirt",
-        "distinctive_features": "Wears a pair of worn, fingerless gloves, even indoors, and stands with a slight, defensive hunch."
+        "build": "fit",
+        "face": "serious expression with a perpetually furrowed brow, often peering over his glasses",
+        "hair": "neatly styled, short light brown hair",
+        "upper_clothing": "grey polo shirt",
+        "distinctive_features": "oil stains on his fingertips despite apparent cleanliness, often adjusts his thick-rimmed glasses"
       },
-      "clue_object": "A specialized, high-gauge fiber optic cable coiled nervously in her hands, its connector end slightly bent.",
-      "secret_motivation": "Thorne routinely blamed her for minor network glitches to cover his own software bugs, and she had discovered a critical vulnerability in his lab's experimental hardware that he refused to address, fearing it would delay his project.",
-      "alibi": "Was in the server room on a different floor, performing routine maintenance, when the power surge hit.",
+      "clue_object": "A small, specialized torque wrench, which he absently clicks open and shut, its metallic sound barely audible.",
+      "secret_motivation": "Was fiercely protective of his robotic arm prototypes and suspected Dr. Thorne was recklessly pushing experimental limits, jeopardizing the integrity of his designs and his professional reputation.",
+      "alibi": "Was in the workshop, located on a different floor, performing emergency maintenance on another prototype that had a power surge during the storm, has timestamped log entries from equipment diagnostics.",
       "guilty": false
     },
     {
       "id": "suspect_4",
-      "name": "Marcus Bell",
-      "role": "Junior AI Research Assistant",
-      "age": 23,
-      "personality": "Outwardly shy and deferential, Marcus possesses a brilliant but highly insecure mind, desperate for recognition and often overshadowed by more assertive colleagues.",
+      "name": "Chloe Davis",
+      "role": "Project Manager",
+      "age": 35,
+      "personality": "Energetic and outwardly optimistic, but deeply pragmatic and financially driven. She prioritizes project deadlines and budget adherence above creative whims.",
       "physical_description": {
-        "build": "skinny",
-        "face": "Soft, boyish features with wide, anxious blue eyes that dart around nervously. A scattering of freckles across his nose.",
-        "hair": "Messy, light brown curly hair, often falling into his eyes.",
-        "upper_clothing": "Pale yellow t-shirt",
-        "distinctive_features": "Wears oversized, noise-canceling headphones around his neck, even when not in use, and habitually bites his lower lip."
+        "build": "fit",
+        "face": "expressive face with a quick, nervous smile that doesn't quite reach her eyes",
+        "hair": "shoulder-length blonde hair, perfectly straightened",
+        "upper_clothing": "vibrant purple blazer",
+        "distinctive_features": "always wears a high-end smartwatch and several intricate silver rings on her right hand"
       },
-      "clue_object": "A small, highly modified screwdriver (with electrical tape on the handle for better grip) visible in his back pocket, and he keeps unconsciously rubbing his thumb against a small burn mark on his palm.",
-      "secret_motivation": "Desperate to prove his worth, Marcus discovered a critical flaw in the 'Chimera Core' that Thorne was ignoring. He attempted to 'fix' it himself, convinced he could impress Thorne, but instead caused a fatal short circuit during the storm.",
-      "alibi": "Claims he was in the downstairs cafeteria, taking a late dinner break, and only heard the commotion after the power flickered.",
-      "guilty": true
+      "clue_object": "A small, elaborately designed stress ball in the shape of a gear, which she squeezes rhythmically, almost unconsciously.",
+      "secret_motivation": "Discovered Dr. Thorne was secretly diverting significant project funds for highly speculative personal research, threatening to derail a critical company initiative and expose her lax oversight to investors.",
+      "alibi": "Claims she was at a late-night video conference call with overseas investors, though her connection was reportedly spotty due to the severe storm.",
+      "guilty": false
     }
   ],
-  "guilty_name": "Marcus Bell"
+  "guilty_name": "Marcus O'Connell"
 }

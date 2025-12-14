@@ -86,8 +86,27 @@ def _safe_get_task_raw(task_obj) -> Optional[str]:
     s = str(task_obj)
     return s if s.strip() else None
 
+def _clean_generated_images() -> None:
+    """Elimina todos los archivos .png/.jpg de la carpeta generated_images."""
+    images_dir_abs = os.path.join(SRC_PATH, "cluedogenai", "generated_images")
+    if not os.path.exists(images_dir_abs):
+        return
+    
+    print(f"Cleaning old images in: {images_dir_abs}")
+    for fname in os.listdir(images_dir_abs):
+        if fname.lower().endswith((".png", ".jpg", ".jpeg")):
+            try:
+                os.path.join(images_dir_abs, fname)
+                os.remove(os.path.join(images_dir_abs, fname))
+            except Exception as e:
+                print(f"Could not delete {fname}: {e}")
+
 
 def generate_case_with_crew() -> Dict:
+
+    # Delete images from previous games
+    _clean_generated_images()
+
     """
     Usa la Crew para generar escena y sospechosos.
     Busca las imágenes directamente en el disco.
@@ -210,6 +229,8 @@ def generate_case_with_crew() -> Dict:
                 guilty_name = s.get("name")
                 break
 
+            
+
     # 2) Vision output (preferir mapping exacto de suspect_images)
     vision_images = {}
     vision_failed = {}
@@ -233,41 +254,57 @@ def generate_case_with_crew() -> Dict:
 
     suspects: List[Dict] = []
 
+    # Rastrear imágenes ya asignadas para evitar repetir la misma imagen en dos sospechosos
+    assigned_images = set()
+
     for s in suspects_raw:
         name = s.get("name", "Unknown")
 
+        # 1. Definir base del sospechoso
         suspect_dict = {
             "name": name,
             "role": s.get("role", ""),
             "personality": s.get("personality", ""),
-            # soporta ambos nombres de campo
             "secret": s.get("secret") or s.get("secret_motivation", ""),
             "guilty": (name == guilty_name),
+            "image_path": None  # <--- IMPORTANTE: Empezamos siempre como None
         }
 
-        # --- 1) Primero: usar output exacto del vision agent
-        img_rel = vision_images.get(name)
-        if img_rel:
-            suspect_dict["image_path"] = img_rel
-            print(f"✅ Image Linked via vision_json: {name} -> {img_rel}")
-        else:
-            # --- 2) Fallback: matchear por prefijo de filename (como tu tool guarda)
+        # 2. Intentar buscar imagen
+        found_path = None
+
+        # A) Intentar vía JSON directo (output de la crew)
+        img_candidate = vision_images.get(name)
+        if img_candidate:
+            # Validar que el archivo existe físicamente (por si hubo error 429 al crearlo)
+            abs_path = os.path.join(CURRENT_DIR, img_candidate)
+            if os.path.exists(abs_path) and abs_path not in assigned_images:
+                found_path = img_candidate
+                print(f"✅ Image Linked via JSON: {name} -> {found_path}")
+
+        # B) Fallback: Escanear carpeta si no se encontró en JSON
+        if not found_path:
             safe_name_prefix = str(name).replace(" ", "_")
-            found = None
+            # Buscamos en los archivos disponibles
             for fname in available_files:
-                if fname.lower().startswith(safe_name_prefix.lower()) and fname.lower().endswith(".png"):
-                    found = fname
+                # Verificamos prefijo y que no sea una imagen ya usada
+                f_abs = os.path.join(images_dir_abs, fname)
+                if (fname.lower().startswith(safe_name_prefix.lower()) 
+                    and fname.lower().endswith(".png")
+                    and f_abs not in assigned_images):
+                    
+                    found_path = os.path.join("src", "cluedogenai", "generated_images", fname)
+                    print(f"✅ Image Linked via Scan: {name} -> {found_path}")
                     break
 
-            if found:
-                rel_path = os.path.join("src", "cluedogenai", "generated_images", found)
-                suspect_dict["image_path"] = rel_path
-                print(f"✅ Image Linked via scan: {name} -> {rel_path}")
-            else:
-                if name in (vision_failed or {}):
-                    print(f"⚠️ Image failed by vision agent: {name} -> {vision_failed[name]}")
-                else:
-                    print(f"❌ No image found for: {name} (prefix: {safe_name_prefix})")
+        # 3. Asignar imagen si se encontró
+        if found_path:
+            suspect_dict["image_path"] = found_path
+            # Marcamos esta ruta absoluta como usada para que nadie más la coja
+            abs_p = os.path.join(CURRENT_DIR, found_path)
+            assigned_images.add(abs_p)
+        else:
+            print(f"❌ No image found for: {name} (Quota exceeded or generation failed)")
 
         suspects.append(suspect_dict)
 
@@ -921,12 +958,24 @@ def render_game() -> None:
 
         with img_col:
             img_rel = s.get("image_path")
+            image_found = False
+            
             if img_rel:
                 abs_path = img_rel if os.path.isabs(img_rel) else os.path.join(CURRENT_DIR, img_rel)
                 if os.path.exists(abs_path):
                     st.image(abs_path, width=240)
-                else:
-                    st.caption("(No image file found)")
+                    image_found = True
+            
+            # FALLBACK: Si no se generó imagen (por error o filtro de seguridad)
+            if not image_found:
+                # Usamos un servicio de placeholders con las iniciales del sospechoso
+                initials = "".join([n[0] for n in s['name'].split()[:2]]).upper()
+                # Un color gris oscuro misterioso (333333) con texto claro
+                placeholder_url = f"https://placehold.co/400x400/333333/DDDDDD/png?text={initials}&font=playfair-display"
+                
+                st.image(placeholder_url, width=240, caption="Identity obscured")
+                # Opcional: Mostrar un mensaje pequeño explicando por qué
+                #st.caption("Image unavailable (Security redacted)")
 
         st.markdown("#### Conversation")
         render_conversation(selected)

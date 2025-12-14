@@ -49,22 +49,6 @@ class Cluedogenai():
             allow_delegation=False,  # probar a cambiar a True si quieres que delegue
         )
 
-    
-    @agent
-    def audio_agent(self) -> Agent: # Delete if we delete this agent
-        return Agent(
-            config=self.agents_config['audio_agent'], # type: ignore[index]
-            verbose=True
-        )
-    
-    @agent
-    def director_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config['director_agent'],  # <- corregido
-            verbose=True
-        )
-
-
     # To learn more about structured task outputs,
     # task dependencies, and task callbacks, check out the documentation:
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
@@ -78,35 +62,18 @@ class Cluedogenai():
     def define_characters(self) -> Task:
         return Task(
             config=self.tasks_config['define_characters'], # type: ignore[index]
-            #output_file='report.md'
         )
     
     @task
     def generate_suspect_dialogue(self) -> Task:
         return Task(
             config=self.tasks_config['generate_suspect_dialogue'], # type: ignore[index]
-            #output_file='report.md'
         )
     
     @task
     def design_scene_visuals(self) -> Task:
         return Task(
             config=self.tasks_config['design_scene_visuals'], # type: ignore[index]
-            #output_file='report.md'
-        )
-    
-    @task
-    def curate_scene_audio(self) -> Task: # Delete if we delete this agent
-        return Task(
-            config=self.tasks_config['curate_scene_audio'], # type: ignore[index]
-            #output_file='report.md'
-        )
-    
-    @task
-    def game_play_director_step(self) -> Task:
-        return Task(
-            config=self.tasks_config['game_play_director_step'], # type: ignore[index]
-            #output_file='report.md'
         )
 
     @crew

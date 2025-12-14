@@ -1,33 +1,37 @@
 ```json
 {
-  "scene_id": "Scene_1_Discovery",
-  "location": "Dr. Aris Thorne's Private Lab (R&D Wing)",
-  "summary": "Amidst a raging storm and the eerie flicker of emergency lights, the body of Dr. Aris Thorne, lead AI architect, is discovered in his private lab. He appears to have been electrocuted by malfunctioning smart equipment. The initial shock shared by the discoverer and the player quickly gives way to a chilling realization that this was no mere accident.",
+  "scene_id": "OpeningScene_Discovery",
+  "location": "The 'Innovation Lab' at Veridian Dynamics Office",
+  "summary": "A violent storm rages outside, plunging the Veridian Dynamics office into a flickering half-light. The player, either working late or arriving for an urgent matter, is met by a panicked security guard, Marcus, who leads them to the Innovation Lab. There, Dr. Aris Thorne, the brilliant but enigmatic lead AI architect, is found dead amidst a tangle of sparking, damaged smart equipment, the victim of a supposed 'accident'.",
   "present_characters": [
-    "Player Character",
-    "Maya Sharma"
+    "Marcus O'Connell",
+    "Player Character"
   ],
   "beats": [
-    "The player character (PC), alerted by a power surge or a distant shout, enters Dr. Thorne's lab to find Maya Sharma, a driven Lead AI Engineer, standing frozen over Thorne's lifeless body.",
-    "Maya, visibly shaken and near tears, points vaguely at the damaged server rack, stammering about a 'terrible accident' and 'the storm'.",
-    "Flickering emergency lights periodically illuminate the scene, revealing the full extent of the damage to the surrounding high-tech equipment and Thorne's unsettling posture.",
-    "Both PC and Maya begin to notice subtle inconsistencies—details that don't quite fit a simple electrical mishap, hinting at something far more sinister.",
-    "A brief, tense exchange between PC and Maya, where her shock seems to intertwine with a complicated, unstated emotion, suggesting a deeper connection or rivalry with the victim."
+    "Player arrives/is at the office, power flickers erratically, an alarm blares briefly before cutting out.",
+    "Marcus O'Connell, visibly agitated and disheveled, rushes towards the player, demanding immediate help and exclaiming about a 'terrible accident'.",
+    "Marcus explains he found something 'unbelievable' in the Innovation Lab and needs someone else to confirm, expressing fear and confusion.",
+    "Player and Marcus proceed to the Innovation Lab, a tense, dim walk through the deserted, storm-battered office corridors.",
+    "Discovery of Dr. Aris Thorne's body, slumped over a console, surrounded by severely damaged robotic equipment and live, sparking wires.",
+    "Marcus, overwhelmed and pale, immediately declares it a tragic 'equipment malfunction', urging caution around the live wires.",
+    "Player has their first opportunity to examine the immediate scene and the victim, while Marcus struggles to regain composure."
   ],
   "visible_clues": [
-    "Dr. Aris Thorne's body, slumped against a heavily damaged, smoking server rack, showing distinct burn marks on his hands and chest.",
-    "A prominent, experimental AI chip (codenamed 'Chimera Core') lying on the floor near Thorne's outstretched hand, its casing slightly cracked and dislodged from its housing.",
-    "Deep scorch marks on the floor directly beneath the server rack, appearing more focused and intense than a general electrical short.",
-    "A small, encrypted data-stick, half-hidden beneath a desk monitor, with its connection port partially forced out.",
-    "The lab's advanced smart-lighting system flickering erratically, casting long, dancing shadows and making it difficult to discern details consistently."
+    "Dr. Aris Thorne's body, clearly deceased, with visible burns and contusions suggesting electrocution or impact from heavy machinery.",
+    "A state-of-the-art robotic arm prototype, partially dismantled and emitting small sparks, one of its powerful manipulators bent at an unnatural, stressed angle.",
+    "A high-end server rack, its reinforced glass panel shattered inwards, revealing damaged internal components and scorch marks.",
+    "A puddle of spilled, cold coffee or energy drink near Thorne's outstretched, rigid hand.",
+    "A small, jagged metallic shard, unlike any common office material, glinting subtly near the victim's feet, partially hidden by debris.",
+    "The relentless flickering of emergency overhead lights, creating disorienting light and shadow play."
   ],
-  "hidden_tension": "Maya Sharma's overt distress masks a complex history of professional rivalry and ethical disagreements with Thorne over 'Project Chimera,' the company's make-or-break AI. Her ambitious nature and Thorne's abrasive methods suggest numerous underlying conflicts, making her a key figure in the unraveling mystery.",
-  "music_mood": "Tense and Ominous",
+  "hidden_tension": "Marcus's immediate 'accident' assessment feels overly defensive, hinting that he either suspects foul play himself and is trying to contain the situation, or he's deliberately trying to deflect attention. The state of the equipment and the unique shard suggest more than a simple malfunction.",
+  "music_mood": "Tense and Eerie",
   "visual_hooks": [
-    "The stark silhouette of Maya Sharma against the floor-to-ceiling window, outside of which the storm rages, punctuated by lightning flashes.",
-    "The victim's body, illuminated by erratic bursts of emergency light and the occasional spark from the damaged server, creating a macabre tableau.",
-    "Rain lashing against the vast windows, blurring the cityscape and enhancing the sense of isolation within the high-tech office.",
-    "The sleek, futuristic lab environment, now disheveled and marked by chaos, contrasting sharply with its usual sterile order."
+    "Torrential rain lashing against large office windows, intermittently illuminated by distant lightning flashes, casting dramatic silhouettes.",
+    "Flickering fluorescent lights above, occasionally plunging the Innovation Lab into near-darkness, then back to a harsh, strobing glow that distorts perceptions.",
+    "The dramatic, almost monstrous, silhouette of advanced, damaged robotics against the dim, stormy backdrop, appearing menacing and chaotic.",
+    "The unnerving stillness of Dr. Thorne's body, starkly contrasted by the constant, erratic sparks and hums from the damaged equipment.",
+    "A single, faint emergency exit sign casting a sickly green glow down a deserted, water-streaked corridor leading to the lab, emphasizing isolation."
   ],
   "victim_name": "Dr. Aris Thorne"
 }
