@@ -55,25 +55,40 @@ class Cluedogenai():
     @task
     def create_scene_blueprint(self) -> Task:
         return Task(
-            config=self.tasks_config['create_scene_blueprint'], # type: ignore[index]
+            config=self.tasks_config['create_scene_blueprint'],
+             agent=self.narrative_agent(),
         )
 
     @task
     def define_characters(self) -> Task:
         return Task(
             config=self.tasks_config['define_characters'], # type: ignore[index]
+            agent=self.character_agent(),
+            context=[self.create_scene_blueprint()], 
         )
     
     @task
     def generate_suspect_dialogue(self) -> Task:
         return Task(
             config=self.tasks_config['generate_suspect_dialogue'], # type: ignore[index]
+            agent=self.dialogue_agent(),
+            context=[self.create_scene_blueprint(), self.define_characters()],
         )
     
     @task
     def design_scene_visuals(self) -> Task:
         return Task(
             config=self.tasks_config['design_scene_visuals'], # type: ignore[index]
+            agent=self.vision_agent(),
+            context=[self.define_characters()],
+        )
+    
+    @task
+    def create_solution(self) -> Task:
+        return Task(
+            config=self.tasks_config["create_solution"],
+            agent=self.narrative_agent(),
+            context=[self.create_scene_blueprint(), self.define_characters()],
         )
 
     @crew
@@ -89,11 +104,12 @@ class Cluedogenai():
                 self.create_scene_blueprint(),
                 self.define_characters(),
                 self.design_scene_visuals(),
+                self.create_solution(),   # ✅ ADD THIS
             ],
             process=Process.sequential,
             verbose=True,
         )
-    
+
 
     @crew
     def dialogue_crew(self) -> Crew:

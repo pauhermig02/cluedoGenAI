@@ -14,6 +14,10 @@ import streamlit as st
 import time
 import random
 import base64
+import copy
+from typing import Any
+import traceback
+
 
 if sys.platform == "win32":
     if not hasattr(signal, "SIGHUP"):
@@ -32,6 +36,15 @@ if SRC_PATH not in sys.path:
     # MUY IMPORTANTE: insertarlo al principio, antes de site-packages
     sys.path.insert(0, SRC_PATH)
 
+ARTIFACTS_DIR = os.path.join(CURRENT_DIR, "artifacts")
+ARTIFACT_FILES = [
+    "scene_blueprint.json",
+    "characters.json",
+    "suspect_images.json",
+    "solution.json",
+]
+
+
 from cluedogenai.crew import Cluedogenai  # noqa: E402
 
 TOTAL_QUESTIONS = 10
@@ -42,6 +55,18 @@ CREW_TOPIC = "AI Murder Mystery"
 # =========================
 #  CREW HELPERS
 # =========================
+
+def _clean_artifacts() -> None:
+    if not os.path.isdir(ARTIFACTS_DIR):
+        return
+    for fname in ARTIFACT_FILES:
+        fpath = os.path.join(ARTIFACTS_DIR, fname)
+        if os.path.exists(fpath):
+            try:
+                os.remove(fpath)
+            except Exception as e:
+                print(f"Could not delete artifact {fname}: {e}")
+
 
 def _extract_json_object_with_key(text: str, required_key: str) -> Optional[dict]:
     """Busca y parsea el PRIMER objeto JSON válido que contenga required_key."""
@@ -60,6 +85,74 @@ def _extract_json_object_with_key(text: str, required_key: str) -> Optional[dict
         except Exception:
             continue
     return None
+
+
+def sanitize_characters_for_dialogue(
+    characters: Optional[Dict[str, Any]],
+    active_suspect: str,
+    *,
+    redact_other_secrets: bool = True,
+) -> Dict[str, Any]:
+    """
+    Returns a copy of `characters` safe to send to the dialogue LLM:
+    - removes guilty flags + guilty_name
+    - optionally removes other suspects' secret_motivation (keep only active suspect secret)
+    """
+    if not isinstance(characters, dict):
+        return {}
+
+    c = copy.deepcopy(characters)
+
+    # Top-level spoiler keys
+    c.pop("guilty_name", None)
+    c.pop("murderer", None)
+    c.pop("solution", None)
+    c.pop("case_solution", None)
+    c.pop("truth", None)
+    c.pop("truth_summary", None)
+
+
+    suspects = c.get("suspects")
+    if not isinstance(suspects, list):
+        return c
+
+    for s in suspects:
+        if not isinstance(s, dict):
+            continue
+
+        # Per-suspect spoiler keys
+        s.pop("guilty", None)
+        s.pop("is_guilty", None)
+        s.pop("culpable", None)
+
+        # Optional: don't let Ben know Maya's secret, etc.
+        if redact_other_secrets and s.get("name") != active_suspect:
+            s.pop("secret_motivation", None)
+            s.pop("secret", None)
+
+    return c
+
+
+def sanitize_scene_blueprint_for_dialogue(
+    scene_blueprint: Optional[Dict[str, Any]],
+    active_suspect: str,
+) -> Dict[str, Any]:
+    """
+    Returns a copy safe-ish for dialogue.
+    Not strictly necessary, but helps consistency:
+    - ensures the active suspect can be "present" without rewriting your artifacts.
+    """
+    if not isinstance(scene_blueprint, dict):
+        return {}
+
+    sb = copy.deepcopy(scene_blueprint)
+
+    present = sb.get("present_characters")
+    if isinstance(present, list):
+        if active_suspect not in present:
+            present.append(active_suspect)
+
+    return sb
 
 
 def _strip_html_tags(text: str) -> str:
@@ -96,7 +189,6 @@ def _clean_generated_images() -> None:
     for fname in os.listdir(images_dir_abs):
         if fname.lower().endswith((".png", ".jpg", ".jpeg")):
             try:
-                os.path.join(images_dir_abs, fname)
                 os.remove(os.path.join(images_dir_abs, fname))
             except Exception as e:
                 print(f"Could not delete {fname}: {e}")
@@ -106,6 +198,7 @@ def generate_case_with_crew() -> Dict:
 
     # Delete images from previous games
     _clean_generated_images()
+    _clean_artifacts()
 
     """
     Usa la Crew para generar escena y sospechosos.
@@ -113,6 +206,7 @@ def generate_case_with_crew() -> Dict:
     """
     base_case = {
         "victim": "Unknown Victim",
+        "victim_role": "Unknown role",
         "time": "Sometime past midnight",
         "place": "An almost empty tech office",
         "cause": "Suspicious accident with smart equipment",
@@ -129,20 +223,34 @@ def generate_case_with_crew() -> Dict:
         "player_action": player_action,
     }
 
-    crew = Cluedogenai().setup_crew()
+    try:
+        crew = Cluedogenai().setup_crew()
+    except Exception as e:
+        raise RuntimeError("setup_crew() crashed:\n" + traceback.format_exc()) from e
 
     try:
-        # ✅ FIX: Avoids telemetry timeout implicitly by env vars above
         result = crew.kickoff(inputs=crew_inputs)
     except Exception as e:
-        raise RuntimeError(f"Error calling CrewAI: {e}") from e
+        raise RuntimeError("crew.kickoff() crashed:\n" + traceback.format_exc()) from e
+
 
     def _read_json_artifact(rel_path: str, required_key: str) -> Optional[dict]:
         abs_path = os.path.join(CURRENT_DIR, rel_path)
         if not os.path.exists(abs_path):
             return None
+
         with open(abs_path, "r", encoding="utf-8") as f:
             txt = f.read().strip()
+
+        # 1) Intento directo: el archivo es JSON puro
+        try:
+            obj = json.loads(txt)
+            if isinstance(obj, dict) and required_key in obj:
+                return obj
+        except Exception:
+            pass
+
+        # 2) Fallback: buscar el primer objeto JSON embebido
         return _extract_json_object_with_key(txt, required_key)
 
 
@@ -150,6 +258,10 @@ def generate_case_with_crew() -> Dict:
     scene_blueprint_json = _read_json_artifact("artifacts/scene_blueprint.json", "scene_id")
     characters_json      = _read_json_artifact("artifacts/characters.json", "suspects")
     vision_json          = _read_json_artifact("artifacts/suspect_images.json", "suspect_images")
+    solution_json = _read_json_artifact("artifacts/solution.json", "truth_summary")
+    if solution_json:
+        st.session_state.solution = solution_json
+
 
     # Save to session
     if scene_blueprint_json: st.session_state.scene_blueprint = scene_blueprint_json
@@ -163,25 +275,39 @@ def generate_case_with_crew() -> Dict:
             base_case["place"] = loc
 
         # Summary -> context
-        summary = scene_blueprint_json.get("summary")
-        if summary:
-            base_case["context"] = summary
+        summary = scene_blueprint_json.get("summary") or ""
+        hidden_tension = scene_blueprint_json.get("hidden_tension") or ""
+        full_ctx = summary.strip()
+        if hidden_tension.strip():
+            base_case["hidden_tension"] = hidden_tension.strip()    
+        if full_ctx:
+            base_case["context"] = full_ctx
+
 
         # Victim name from present_characters
-        # ✅ Victim name: now comes explicitly from the blueprint
         vname = scene_blueprint_json.get("victim_name")
         if isinstance(vname, str) and vname.strip():
             base_case["victim"] = vname.strip()
 
+        # Victim role
+        vrole = scene_blueprint_json.get("victim_role")
+        if isinstance(vrole, str) and vrole.strip():
+            base_case["victim_role"] = vrole.strip()
 
-        # Time (scene blueprint doesn’t always include a "time" field)
-        # Derive a nicer one from summary if possible
-        if summary:
+
+        t = scene_blueprint_json.get("time")
+        ht = scene_blueprint_json.get("hidden_tension")
+        if isinstance(ht, str) and ht.strip():
+            base_case["hidden_tension"] = ht.strip()
+        if isinstance(t, str) and t.strip():
+            base_case["time"] = t.strip()
+        elif summary:
             low = summary.lower()
             if "storm" in low or "violent storm" in low:
                 base_case["time"] = "Late night during a violent storm"
             elif "midnight" in low:
                 base_case["time"] = "Just after midnight"
+
 
         # Cause from visible clues (if available)
         clues = scene_blueprint_json.get("visible_clues") or []
@@ -201,11 +327,11 @@ def generate_case_with_crew() -> Dict:
         if isinstance(tasks_out, list):
             for t in tasks_out:
                 raw = _safe_get_task_raw(t) or ""
-                obj = _extract_json_object_with_key(str(result), "suspects")
-
+                obj = _extract_json_object_with_key(raw, "suspects")
                 if obj:
                     characters_json = obj
                     break
+
 
 
 
@@ -233,18 +359,14 @@ def generate_case_with_crew() -> Dict:
 
     # 2) Vision output (preferir mapping exacto de suspect_images)
     vision_images = {}
-    vision_failed = {}
     if isinstance(vision_json, dict):
         vision_images = vision_json.get("suspect_images") or {}
-        vision_failed = vision_json.get("failed") or {}
 
     # Fallback: si no hay artifacts, intentar sacar suspect_images del result final
     if not vision_images:
         obj = _extract_json_object_with_key(str(result), "suspect_images")
         if obj and isinstance(obj.get("suspect_images"), dict):
             vision_images = obj.get("suspect_images") or {}
-            vision_failed = obj.get("failed") or {}
-
 
     # 3) Scan folder como fallback final (si tampoco vino mapping)
     images_dir_abs = os.path.join(SRC_PATH, "cluedogenai", "generated_images")
@@ -264,8 +386,10 @@ def generate_case_with_crew() -> Dict:
         suspect_dict = {
             "name": name,
             "role": s.get("role", ""),
+            "age": s.get("age"),
             "personality": s.get("personality", ""),
-            "secret": s.get("secret") or s.get("secret_motivation", ""),
+            "alibi": s.get("alibi", ""),
+            "secret": s.get("secret_motivation", ""),
             "guilty": (name == guilty_name),
             "image_path": None  # <--- IMPORTANTE: Empezamos siempre como None
         }
@@ -321,24 +445,42 @@ def call_crew_for_answer(
     suspect_name: str,
     history: List[Dict],
     question: str,
-) -> str:
+) -> dict:
     """
     Usa la Crew para generar la respuesta del sospechoso.
     """
-    system_prompt = build_system_prompt(case, suspect_name)
     user_prompt = build_user_prompt(suspect_name, history, question)
 
     scene_blueprint = st.session_state.get("scene_blueprint")
     characters = st.session_state.get("characters")
 
+    safe_scene_blueprint = sanitize_scene_blueprint_for_dialogue(scene_blueprint, suspect_name)
+    safe_characters = sanitize_characters_for_dialogue(
+        characters,
+        suspect_name,
+        redact_other_secrets=True,   # <- set False if you WANT suspects to know others' secrets (usually no)
+    )
+
     crew_inputs = {
         "topic": CREW_TOPIC,
         "current_year": str(datetime.now().year),
-        "game_state": system_prompt,
+        "game_state": json.dumps(
+            {
+                "victim": case.get("victim"),
+                "time": case.get("time"),
+                "place": case.get("place"),
+                "cause": case.get("cause"),
+                # optional: shorten this to avoid duplication; scene_blueprint.summary already has it
+                "context": "",  
+                "active_suspect": suspect_name,
+            },
+            ensure_ascii=False
+        ),
         "player_action": user_prompt,
-        "scene_blueprint": json.dumps(scene_blueprint, ensure_ascii=False) if scene_blueprint else "",
-        "characters": json.dumps(characters, ensure_ascii=False) if characters else "",
+        "scene_blueprint": json.dumps(safe_scene_blueprint, ensure_ascii=False) if safe_scene_blueprint else "",
+        "characters": json.dumps(safe_characters, ensure_ascii=False) if safe_characters else "",
     }
+
 
     try:
         crew = Cluedogenai().dialogue_crew()
@@ -366,34 +508,49 @@ def call_crew_for_answer(
 
 
         if isinstance(data, dict):
-            spoken = data.get("spoken_text") or data.get("answer") or data.get("text")
-            if spoken:
-                return spoken.strip()
+            return {
+                "spoken_text": (data.get("spoken_text") or data.get("answer") or data.get("text") or "").strip(),
+                "inner_thoughts": (data.get("inner_thoughts") or "").strip(),
+                "revealed_facts": data.get("revealed_facts") or [],
+                "implied_clues": data.get("implied_clues") or [],
+            }
 
         raw_fallback = str(result)
         data_fb = _extract_json_object_with_key(raw_fallback, "spoken_text")
         if isinstance(data_fb, dict):
             spoken_fb = data_fb.get("spoken_text") or data_fb.get("answer") or data_fb.get("text")
             if spoken_fb:
-                return spoken_fb.strip()
+                return {"spoken_text": spoken_fb, "inner_thoughts": "", "revealed_facts": [], "implied_clues": []}
 
         answer_text = raw_fallback.strip()
         if len(answer_text) > 400:
             answer_text = answer_text[:400] + "..."
-        return answer_text
+        return {"spoken_text": answer_text, "inner_thoughts": "", "revealed_facts": [], "implied_clues": []}
 
     except Exception as e:
         msg = str(e)
         if "429" in msg or "RESOURCE_EXHAUSTED" in msg or "Quota exceeded" in msg:
-            return (
-                "The overhead lights flicker and the network icon turns red. "
-                "«Systems are throttled… you won’t get more out of me right now,» "
-                "the suspect says, dodging your question."
-            )
-        return (
-            "The suspect just stares back at you. "
-            "Something in the system glitched and they refuse to answer."
-        )
+            return {
+                "spoken_text": (
+                    "The overhead lights flicker and the network icon turns red. "
+                    "«Systems are throttled… you won’t get more out of me right now,» "
+                    "the suspect says, dodging your question."
+                ),
+                "inner_thoughts": "The system is throttled; I should stall and stay vague.",
+                "revealed_facts": [],
+                "implied_clues": ["System throttling occurred during interrogation (possible API quota)."],
+            }
+
+        return {
+            "spoken_text": (
+                "The suspect just stares back at you. "
+                "Something in the system glitched and they refuse to answer."
+            ),
+            "inner_thoughts": f"Unexpected error: {msg[:120]}",
+            "revealed_facts": [],
+            "implied_clues": [],
+        }
+
 
 
 # =========================
@@ -526,7 +683,6 @@ def init_music_state_local() -> None:
 
     tracks = _scan_audio_assets()
     st.session_state.music_tracks = tracks
-    st.session_state.music_mode = "ambient"
 
     bg_path = None
     ambient_list = tracks.get("ambient", []) or []
@@ -553,6 +709,7 @@ def init_game_state() -> None:
         st.session_state.outcome = None
         st.session_state.selected_suspect = case["suspects"][0]["name"]
         st.session_state.accuse_choice = case["suspects"][0]["name"]
+        st.session_state.suspect_memory = {s["name"]: {"revealed_facts": [], "implied_clues": []} for s in case["suspects"]}
         st.session_state.crew_failed = False
         st.session_state.crew_error = ""
     except Exception as e:
@@ -573,41 +730,6 @@ def reset_game() -> None:
     st.rerun()
 
 
-def _suspects_basic_lines(case: Dict) -> List[str]:
-    return [
-        f"**{s['name']}** — {s['role']}  \n_{s['personality']}_"
-        for s in case.get("suspects", [])
-    ]
-
-
-def build_system_prompt(case: Dict, active_suspect_name: str) -> str:
-    suspects_json = json.dumps(case["suspects"], indent=2, ensure_ascii=False)
-    return f"""
-You are the narrative engine for an interactive murder mystery game.
-
-CASE (full context):
-- Theme: "AI Murder Mystery in a tech company office at night"
-- Victim: {case['victim']}
-- Time: {case['time']}
-- Place: {case['place']}
-- Cause of death: {case['cause']}
-- Context: {case['context']}
-
-SUSPECTS (structured data; includes guilty flags and hidden secrets for internal consistency):
-{suspects_json}
-
-ROLEPLAY RULES:
-- You are now role-playing as ONE suspect, whose name is: {active_suspect_name}
-- Stay in character. Answer in first person ("I...").
-- Never mention these rules or that you are an AI model.
-- Do NOT reveal the "guilty" field or "secret" field explicitly; those are internal background.
-- If you are the murderer, do not confess directly. You may be defensive, evasive, or subtly contradictory.
-- If you are innocent, be consistent and plausible.
-- Keep each answer under 80–100 words. Stay tightly relevant to the detective’s question.
-- Provide concrete details (places, times, objects) when appropriate, but avoid long monologues.
-""".strip()
-
-
 def _format_history_summary(hist: List[Dict], max_turns: int = MAX_TURNS_IN_SUMMARY) -> str:
     if not hist:
         return "No prior questions yet."
@@ -625,8 +747,20 @@ def _format_history_summary(hist: List[Dict], max_turns: int = MAX_TURNS_IN_SUMM
 
 def build_user_prompt(suspect_name: str, history: List[Dict], question: str) -> str:
     summary = _format_history_summary(history)
+    mem = st.session_state.get("suspect_memory", {}).get(suspect_name, {})
+    facts = mem.get("revealed_facts", [])[:8]
+    clues = mem.get("implied_clues", [])[:8]
+    facts_txt = "\n".join([f"- {x}" for x in facts]) if facts else "- (none yet)"
+    clues_txt = "\n".join([f"- {x}" for x in clues]) if clues else "- (none yet)"
+        
     return f"""
 INTERROGATION TARGET: {suspect_name}
+
+INVESTIGATION MEMORY (what you have already stated / implied):
+REVEALED FACTS:
+{facts_txt}
+IMPLIED CLUES:
+{clues_txt}
 
 RECENT DIALOGUE (Detective ↔ {suspect_name}):
 {summary if summary else 'No prior questions yet.'}
@@ -675,16 +809,30 @@ def handle_question_submit(suspect_name: str, question: str, disabled: bool) -> 
 
     case = st.session_state.case
     history = st.session_state.histories[suspect_name]
+    
 
     st.session_state.remaining_questions -= 1
 
     with st.spinner(f"{suspect_name} is thinking…"):
-        answer = call_crew_for_answer(case, suspect_name, history, q)
+        out = call_crew_for_answer(case, suspect_name, history, q)
+        answer = out.get("spoken_text", "")
+
 
     answer = unescape(answer or "")
     answer = _strip_html_tags(answer)
 
-    history.append({"q": q, "a": answer})
+    rf = out.get("revealed_facts") or []
+    ic = out.get("implied_clues") or []
+    history.append({"q": q, "a": answer, "revealed_facts": rf, "implied_clues": ic})
+
+    mem = st.session_state.suspect_memory.get(suspect_name)
+    if mem is not None:
+        for item in rf:
+            if item and item not in mem["revealed_facts"]:
+                mem["revealed_facts"].append(item)
+        for item in ic:
+            if item and item not in mem["implied_clues"]:
+                mem["implied_clues"].append(item)
 
     try:
         trigger_question_sound_local()
@@ -731,7 +879,33 @@ def handle_accusation(accused_name: str, disabled: bool) -> None:
 
     st.session_state.accused = accused_name
     won = accused_name == guilty_name
-    epilogue = _generate_epilogue(case, accused_name, won, guilty_name)
+
+
+    solution = st.session_state.get("solution") or {}
+    truth = solution.get("truth_summary", "")
+    method = solution.get("method", "")
+    cover = solution.get("cover_up", "")
+    motive = solution.get("motive", "")
+    evidence = solution.get("key_evidence") or []
+    timeline = solution.get("timeline") or []
+
+    truth_block = ""
+    if truth:
+        truth_block += f"\n\n### What really happened\n{truth}\n"
+    if method:
+        truth_block += f"\n\n**Method:** {method}"
+    if cover:
+        truth_block += f"\n\n**Cover-up:** {cover}"
+    if motive:
+        truth_block += f"\n\n**Motive:** {motive}"
+    if evidence:
+        truth_block += "\n\n**Key evidence:**\n" + "\n".join([f"- {e}" for e in evidence[:5]])
+    if timeline:
+        truth_block += "\n\n**Timeline:**\n" + "\n".join([f"- {t}" for t in timeline[:5]])
+
+
+    epilogue = _generate_epilogue(case, accused_name, won, guilty_name) + truth_block
+
 
     st.session_state.outcome = {
         "won": won,
@@ -900,6 +1074,7 @@ def render_game() -> None:
         with tabs[0]:
             st.markdown("### Case")
             victim = escape(case.get("victim", "Unknown victim"))
+            victim_role = escape(case.get("victim_role", "Unknown role"))
             time_ = escape(case.get("time", "Unknown time"))
             place = escape(case.get("place", "Unknown place"))
             cause = escape(case.get("cause", "Unknown cause"))
@@ -907,7 +1082,7 @@ def render_game() -> None:
 
             st.markdown(
                 f"""
-- **Victim:** {victim}
+- **Victim:** {victim} — _{victim_role}_
 - **Time:** {time_}
 - **Place:** {place}
 - **Cause:** {cause}
@@ -924,6 +1099,8 @@ def render_game() -> None:
                 for s in case.get("suspects", []):
                     st.markdown(f"**{s['name']}** — {s['role']}")
                     st.caption(s.get("personality", ""))
+                    if s.get("alibi"):
+                        st.caption(f"**Alibi:** {s['alibi']}")
 
     # -------- CENTER: Interrogation --------
     with col_interrogation:
@@ -949,6 +1126,7 @@ def render_game() -> None:
                   <div style="font-weight:800; font-size:16px;">{escape(s['name'])}</div>
                   <div style="opacity:0.85; font-size:13px;">
                     {escape(s.get('role',''))}<br/>
+                    <span style="opacity:0.8;">Age: {escape(str(s.get('age','?')))} · Alibi: {escape(s.get('alibi',''))}</span><br/>
                     <span style="opacity:0.8;">{escape(s.get('personality',''))}</span>
                   </div>
                 </div>
