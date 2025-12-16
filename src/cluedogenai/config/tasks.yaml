@@ -1,27 +1,59 @@
 create_scene_blueprint:
   description: >
     Using the current {game_state} and the latest {player_action}, design the
-    next narrative scene of the murder mystery. Focus on:
-    1. Where the scene takes place and who is present
-    2. What is happening right now (summary and key dramatic beats)
-    3. Which clues are visible to the player
-    4. Which tensions or secrets are hidden beneath the surface
-    5. What overall mood and visual hooks define this moment
+    opening narrative scene of the murder mystery.
+    You MUST also define the full cast seed (exactly 4 suspects) with name+role,
+    so the character agent can expand them consistently.
   expected_output: >
-    A valid JSON "scene_blueprint" object with at least:
-    - "scene_id": unique id or name of the scene
-    - "location": short description of the place
-    - "summary": 2–4 sentences describing the current situation
-    - "present_characters": list of character ids or names in the scene
-    - "beats": ordered list of key dramatic beats
-    - "visible_clues": list of clues that can be noticed now
-    - "hidden_tension": 1–2 sentences about underlying conflict/secrets
-    - "music_mood": a simple label for the audio agent (e.g. "tense", "calm")
-    - "visual_hooks": list of strong visual elements for the vision agent
-    - "victim_name": full name of the victim
+    You MUST return ONLY valid JSON (no markdown, no extra text).
+    The JSON must include at least these fields:
+
+    {
+      "scene_id": "string",
+      "location": "string",
+      "time": "string",
+      "summary": "string (2–4 sentences)",
+      "present_characters": ["string", "string"],
+      "visible_clues": ["string"],
+      "hidden_tension": "string (1–2 sentences)",
+      "music_mood": "calm|tense|ominous|urgent",
+      "visual_hooks": ["string"],
+      "victim_name": "string",
+      "victim_role": "string",
+      "suspect_seeds": [
+        {"id":"suspect_1","name":"Full Name","role":"Tech-company role"},
+        {"id":"suspect_2","name":"Full Name","role":"Tech-company role"},
+        {"id":"suspect_3","name":"Full Name","role":"Tech-company role"},
+        {"id":"suspect_4","name":"Full Name","role":"Tech-company role"}
+      ]
+    }
+
+    Rules:
+    - suspect_seeds MUST contain exactly 4 suspects.
+    - All suspect names must be unique, simple, and filename-safe (letters + spaces only).
+    - victim_name must NOT match any suspect name.
+    - Do not reveal who is guilty.
   agent: narrative_agent
   output_file: artifacts/scene_blueprint.json
   
+create_solution:
+  description: >
+    Using create_scene_blueprint and define_characters, write the TRUE solution of the case.
+    This will be shown ONLY after the player accuses someone.
+  expected_output: >
+    ONLY valid JSON:
+    {
+      "truth_summary": "2-4 sentences of what really happened",
+      "murderer": "Full Name",
+      "method": "How the victim died (specific)",
+      "cover_up": "How it was staged as an accident",
+      "motive": "Real motive (workplace-realistic)",
+      "key_evidence": ["string", "string", "string"],
+      "timeline": ["string", "string", "string"]
+    }
+  agent: narrative_agent
+  output_file: artifacts/solution.json
+
 
 define_characters:
   description: >
@@ -51,7 +83,6 @@ define_characters:
             "upper_clothing": "specific color + garment (must be a unique color per suspect)",
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
-          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "physical_description": {
             "build": "skinny|fit|fat",
             "face": "short phrase describing facial traits",
@@ -59,6 +90,7 @@ define_characters:
             "upper_clothing": "specific color + garment (must be a unique color per suspect)",
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
+          "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
@@ -79,13 +111,6 @@ define_characters:
             "distinctive_features": "short phrase (tattoos, posture, accessories)"
             },
           "clue_object": "A small, concrete physical object they are holding or fidgeting with that subtly hints at their secret (e.g., 'a crumpled letter', 'a nervous habit with a lighter', 'a weirdly encrypted USB').",
-          "physical_description": {
-            "build": "skinny|fit|fat",
-            "face": "short phrase describing facial traits",
-            "hair": "short phrase describing hairstyle/color",
-            "upper_clothing": "specific color + garment (must be a unique color per suspect)",
-            "distinctive_features": "short phrase (tattoos, posture, accessories)"
-            },
           "secret_motivation": "Hidden goal, fear or conflict. Must be subtle, realistic, and related to workplace context",
           "alibi": "Short description of where they claim to be during the murder window",
           "guilty": "True if this character is guilty (i.e., they are the murderer) or false if they are not"
@@ -141,6 +166,7 @@ define_characters:
     - The descriptions here must match what was described in the scene.
     - Roles must fit inside a tech company.
     - Personalities must be vivid and unique.
+    - Names must be unique and filename-safe: letters + spaces only.
     - Physical descriptions must emphasize facial features, hair, clothing, and distinctive traits.
     - The clothing color must not repeat across suspects.
     - Motivations must feel plausible, not melodramatic.
@@ -151,8 +177,6 @@ define_characters:
     - "guilty_name" must match the "name" of the guilty suspect.
     - Final output must be valid JSON, with no markdown and no trailing commas.
   agent: character_agent
-  context:
-    - create_scene_blueprint
   output_file: artifacts/characters.json
 
 
@@ -191,9 +215,6 @@ generate_suspect_dialogue:
         "implied_clues": []
       }
   agent: dialogue_agent
-  context:
-    - create_scene_blueprint
-    - define_characters
 
 design_scene_visuals:
   description: >
@@ -224,6 +245,4 @@ design_scene_visuals:
       }
     }
   agent: vision_agent
-  context:
-    - define_characters
   output_file: artifacts/suspect_images.json
