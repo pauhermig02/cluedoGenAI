@@ -1,0 +1,92 @@
+I need to design the opening scene for a murder mystery in a tech office.
+I must define the victim and four distinct suspects with names and roles suitable for a tech company.
+The scene should include location, time, a summary, present characters, visible clues, hidden tension, music mood, and visual hooks.
+The cause of death is a "suspicious accident with smart equipment" and the context is a "storm hitting the city" with "backup power keeping systems barely alive."
+
+Let's break this down:
+1.  **Victim Identity**: Need a name and a role. Let's make him someone important enough for conflict, perhaps a project lead or a visionary. "Arthur Vance, Lead AI Architect".
+2.  **Suspects**: Four distinct characters, plausible roles, potential for conflict.
+    *   Suspect 1: Someone close to the victim's project, maybe a rival or a resentful subordinate. "Eleanor Finch, Senior Software Engineer" - perhaps she felt overlooked.
+    *   Suspect 2: Someone from a different department, perhaps sales or management, with a financial stake or personal grudge. "Marcus Chen, Head of Product" - could be pressure to deliver.
+    *   Suspect 3: An outsider or someone with access but less direct involvement, perhaps a facilities manager or a night-shift employee. "Lena Petrova, Night Shift Security Guard" - access to everything, sees a lot.
+    *   Suspect 4: Another tech role, maybe an intern or a junior developer, who might have been exploited or had a secret. "Samir Khan, Junior Data Scientist" - maybe felt taken advantage of, or discovered something.
+3.  **Scene Details**:
+    *   `scene_id`: "opening_discovery"
+    *   `location`: "The 'Innovation Hub' - an open-plan office space, now dimly lit"
+    *   `time`: "Sometime past midnight, amidst a raging storm"
+    *   `summary`: A night security guard discovers the body of the lead AI architect, Arthur Vance, in a darkened office section. The victim appears to have been electrocuted by a malfunctioning prototype device, but the scene holds subtle anomalies.
+    *   `present_characters`: "Player Character (You)", "Lena Petrova" (Security Guard)
+    *   `visible_clues`:
+        *   "The victim, Arthur Vance, slumped over a large, advanced AI prototype workstation."
+        *   "A charred power cable snaking from the prototype to Arthur's hand."
+        *   "Flickering overhead lights, powered by backup generators, casting long, erratic shadows."
+        *   "A half-eaten, cold slice of pizza on a desk nearby."
+        *   "A shattered coffee mug on the floor, its contents spilled."
+        *   "A small, smudged USB drive partially hidden under a stack of papers on an adjacent desk."
+    *   `hidden_tension`: The flickering lights and the wailing wind outside heighten the sense of isolation and dread, making the 'accident' feel eerily deliberate in the deserted office.
+    *   `music_mood`: "ominous"
+    *   `visual_hooks`:
+        *   "A flash of lightning outside momentarily illuminates the victim's pale, rigid face."
+        *   "Sparks occasionally jump from the exposed wiring of the AI prototype."
+        *   "The security guard's flashlight beam cutting through the gloom, revealing unsettling details."
+
+Let's make sure all constraints are met:
+-   ONLY valid JSON.
+-   All required fields.
+-   `suspect_seeds` list with EXACTLY 4 items.
+-   Each item in `suspect_seeds` has `id`, `name`, `role`.
+-   `victim_name` and `victim_role` present.
+-   Names are simple and filename-safe.
+-   Roles are realistic.
+-   No murderer reveal.
+-   No "guilty" or solution mention.
+-   Pacing: opening scene, strong hook, 3-6 visible clues (I have 6), 4-7 beats (implied by the summary and clues).
+
+Looks good.```json
+{
+  "scene_id": "opening_discovery",
+  "location": "The 'Innovation Hub' - an open-plan office space, now dimly lit",
+  "time": "Sometime past midnight, amidst a raging storm",
+  "summary": "A night security guard, Lena Petrova, has discovered the body of Arthur Vance, the lead AI architect, in a darkened section of the office. He appears to have been electrocuted by a malfunctioning prototype device. The storm rages outside, and backup power keeps the building's systems barely alive, casting the scene in an eerie, flickering glow.",
+  "present_characters": ["Player Character", "Lena Petrova"],
+  "visible_clues": [
+    "The victim, Arthur Vance, slumped over a large, advanced AI prototype workstation.",
+    "A charred power cable snaking from the prototype to Arthur's hand.",
+    "Flickering overhead lights, powered by backup generators, casting long, erratic shadows.",
+    "A half-eaten, cold slice of pizza on a desk nearby.",
+    "A shattered coffee mug on the floor, its contents spilled.",
+    "A small, smudged USB drive partially hidden under a stack of papers on an adjacent desk."
+  ],
+  "hidden_tension": "The 'accident' feels unsettlingly deliberate in the deserted, storm-battered office. The unreliable power and isolation hint at a compromised environment.",
+  "music_mood": "ominous",
+  "visual_hooks": [
+    "A flash of lightning outside momentarily illuminates the victim's pale, rigid face.",
+    "Sparks occasionally jump from the exposed wiring of the AI prototype.",
+    "The security guard's flashlight beam cutting through the gloom, revealing unsettling details."
+  ],
+  "victim_name": "Arthur Vance",
+  "victim_role": "Lead AI Architect",
+  "suspect_seeds": [
+    {
+      "id": "suspect_1",
+      "name": "Eleanor Finch",
+      "role": "Senior Software Engineer"
+    },
+    {
+      "id": "suspect_2",
+      "name": "Marcus Chen",
+      "role": "Head of Product"
+    },
+    {
+      "id": "suspect_3",
+      "name": "Lena Petrova",
+      "role": "Night Shift Security Guard"
+    },
+    {
+      "id": "suspect_4",
+      "name": "Samir Khan",
+      "role": "Junior Data Scientist"
+    }
+  ]
+}
+```
